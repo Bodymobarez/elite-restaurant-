@@ -1,18 +1,20 @@
 import { CustomerLayout } from "@/components/layout/CustomerLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import heroBg from "@assets/generated_images/atmospheric_dark_fine_dining_restaurant_interior.png";
 import { useRestaurants, useGovernorates, useDistricts } from "@/lib/api";
 import { Link, useLocation } from "wouter";
-import { ArrowRight, Star, MapPin, Search, Loader2, Building2, Navigation } from "lucide-react";
+import { ArrowRight, Star, MapPin, Loader2, Building2, Navigation } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
   const [selectedGovernorate, setSelectedGovernorate] = useState<string | undefined>();
   const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>();
   const [, navigate] = useLocation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === 'ar';
   
   const { data: governorates } = useGovernorates();
   const { data: districts } = useDistricts(selectedGovernorate);
@@ -26,6 +28,9 @@ export default function Home() {
   const handleDistrictChange = (value: string) => {
     setSelectedDistrict(value);
   };
+
+  const getGovernorateName = (gov: any) => isArabic ? gov.nameAr : gov.name;
+  const getDistrictName = (district: any) => isArabic ? district.nameAr : district.name;
 
   return (
     <CustomerLayout>
@@ -47,10 +52,10 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-white mb-6 tracking-tight leading-tight">
-              Elite <span className="text-primary italic">مصر</span>
+              {t('home.heroTitle')} <span className="text-primary italic">{t('home.heroHighlight')}</span>
             </h1>
             <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-              Discover Egypt's most exclusive culinary destinations. From Cairo's finest rooftops to Alexandria's seafood gems.
+              {t('home.heroSubtitle')}
             </p>
             
             {/* Location Selection */}
@@ -62,12 +67,12 @@ export default function Home() {
                     className="w-full sm:w-[200px] h-12 bg-white/10 border-white/20 text-white backdrop-blur-md rounded-full focus:ring-primary/50"
                     data-testid="select-governorate"
                   >
-                    <SelectValue placeholder="Select Governorate" />
+                    <SelectValue placeholder={t('home.selectGovernorate')} />
                   </SelectTrigger>
                   <SelectContent className="bg-background/95 backdrop-blur-md border-white/10">
                     {governorates?.map((gov) => (
                       <SelectItem key={gov.id} value={gov.id} data-testid={`option-gov-${gov.id}`}>
-                        {gov.name} - {gov.nameAr}
+                        {getGovernorateName(gov)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -85,12 +90,12 @@ export default function Home() {
                     className="w-full sm:w-[200px] h-12 bg-white/10 border-white/20 text-white backdrop-blur-md rounded-full focus:ring-primary/50 disabled:opacity-50"
                     data-testid="select-district"
                   >
-                    <SelectValue placeholder="Select District" />
+                    <SelectValue placeholder={t('home.selectDistrict')} />
                   </SelectTrigger>
                   <SelectContent className="bg-background/95 backdrop-blur-md border-white/10">
                     {districts?.map((district) => (
                       <SelectItem key={district.id} value={district.id} data-testid={`option-district-${district.id}`}>
-                        {district.name} - {district.nameAr}
+                        {getDistrictName(district)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -99,7 +104,7 @@ export default function Home() {
               
               <Link href="/restaurants">
                 <Button size="lg" className="rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-medium" data-testid="button-explore">
-                  Explore
+                  {t('home.explore')}
                 </Button>
               </Link>
             </div>
@@ -121,7 +126,7 @@ export default function Home() {
                   }}
                   data-testid="button-clear-filters"
                 >
-                  Clear Filters
+                  {t('common.clearFilters')}
                 </Button>
               </motion.div>
             )}
@@ -134,12 +139,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="font-heading text-3xl md:text-4xl text-white mb-2">Curated Selections</h2>
-              <p className="text-muted-foreground">Hand-picked by our culinary experts.</p>
+              <h2 className="font-heading text-3xl md:text-4xl text-white mb-2">{t('home.curatedSelections')}</h2>
+              <p className="text-muted-foreground">{t('home.curatedSubtitle')}</p>
             </div>
             <Link href="/restaurants">
               <Button variant="link" className="text-primary hover:text-primary/80 p-0 gap-2" data-testid="link-view-all">
-                View All <ArrowRight className="w-4 h-4" />
+                {t('home.viewAll')} <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
@@ -192,7 +197,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-center py-20 text-muted-foreground">
-              <p>No restaurants available yet. Check back soon!</p>
+              <p>{t('home.noRestaurants')}</p>
             </div>
           )}
         </div>
@@ -201,14 +206,14 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-24 px-6 bg-card/30 border-y border-white/5">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-heading text-3xl md:text-5xl text-white mb-6">Are you a Restaurant Owner?</h2>
+          <h2 className="font-heading text-3xl md:text-5xl text-white mb-6">{t('home.restaurantOwner')}</h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Join Elite Hub to showcase your culinary artistry to the world's most discerning diners. Manage reservations, menus, and analytics in one sophisticated platform.
+            {t('home.restaurantOwnerDesc')}
           </p>
           <div className="flex justify-center gap-4">
              <Link href="/auth?role=restaurant">
               <Button size="lg" variant="outline" className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground" data-testid="button-partner">
-                Partner With Us
+                {t('home.partnerWithUs')}
               </Button>
              </Link>
           </div>

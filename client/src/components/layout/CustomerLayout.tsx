@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import logo from "@assets/generated_images/minimalist_gold_luxury_logo_icon.png";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,12 +8,15 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 export function CustomerLayout({ children }: { children: React.ReactNode }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [location, setLocation] = useLocation();
   const isHome = location === "/";
   const { user, logout } = useAuth();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,8 +37,14 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
     return "/profile";
   };
 
+  const getDashboardLabel = () => {
+    if (user?.role === "admin") return t('nav.adminDashboard');
+    if (user?.role === "restaurant_owner") return t('nav.restaurantDashboard');
+    return t('nav.myProfile');
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className={cn("min-h-screen bg-background text-foreground flex flex-col font-sans", isRTL && "rtl")}>
       <nav
         className={cn(
           "fixed top-0 w-full z-50 transition-all duration-300 border-b border-transparent px-6 py-4",
@@ -50,12 +60,13 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-sm font-medium hover:text-primary transition-colors text-white/90 cursor-pointer">Home</Link>
-            <Link href="/restaurants" className="text-sm font-medium hover:text-primary transition-colors text-white/90 cursor-pointer">Restaurants</Link>
-            <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors text-white/90 cursor-pointer">Our Story</Link>
+            <Link href="/" className="text-sm font-medium hover:text-primary transition-colors text-white/90 cursor-pointer">{t('nav.home')}</Link>
+            <Link href="/restaurants" className="text-sm font-medium hover:text-primary transition-colors text-white/90 cursor-pointer">{t('nav.restaurants')}</Link>
+            <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors text-white/90 cursor-pointer">{t('nav.ourStory')}</Link>
           </div>
 
           <div className="flex items-center gap-4">
+            <LanguageToggle />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -71,15 +82,15 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-card border-white/10 w-48">
                   <DropdownMenuItem onClick={() => setLocation(getDashboardLink())} className="cursor-pointer" data-testid="menu-dashboard">
-                    {user.role === "admin" ? "Admin Dashboard" : user.role === "restaurant_owner" ? "Restaurant Dashboard" : "My Profile"}
+                    {getDashboardLabel()}
                   </DropdownMenuItem>
                   {user.role === "customer" && (
                     <DropdownMenuItem onClick={() => setLocation("/profile")} className="cursor-pointer" data-testid="menu-reservations">
-                      My Reservations
+                      {t('nav.myReservations')}
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={handleLogout} className="text-rose-400 cursor-pointer" data-testid="menu-logout">
-                    Sign Out
+                    {t('nav.signOut')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -87,12 +98,12 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
               <>
                 <Link href="/auth">
                   <Button variant="ghost" size="sm" className="text-white hover:text-primary hover:bg-white/5 hidden md:flex" data-testid="button-login">
-                    Log In
+                    {t('nav.login')}
                   </Button>
                 </Link>
                 <Link href="/auth?mode=signup">
                   <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium" data-testid="button-signup">
-                    Sign Up
+                    {t('nav.signup')}
                   </Button>
                 </Link>
               </>
@@ -113,42 +124,42 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
               <span className="font-heading text-xl text-white">Elite<span className="text-primary">Hub</span></span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Curating the world's finest dining experiences for the most discerning palates.
+              {t('footer.tagline')}
             </p>
           </div>
           
           <div>
-            <h4 className="font-heading text-white mb-4">Discover</h4>
+            <h4 className="font-heading text-white mb-4">{t('footer.discover')}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/restaurants" className="hover:text-primary transition-colors cursor-pointer">New Arrivals</Link></li>
-              <li><Link href="/restaurants" className="hover:text-primary transition-colors cursor-pointer">Michelin Starred</Link></li>
-              <li><Link href="/restaurants" className="hover:text-primary transition-colors cursor-pointer">Private Dining</Link></li>
+              <li><Link href="/restaurants" className="hover:text-primary transition-colors cursor-pointer">{t('footer.newArrivals')}</Link></li>
+              <li><Link href="/restaurants" className="hover:text-primary transition-colors cursor-pointer">{t('footer.michelinStarred')}</Link></li>
+              <li><Link href="/restaurants" className="hover:text-primary transition-colors cursor-pointer">{t('footer.privateDining')}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-heading text-white mb-4">Company</h4>
+            <h4 className="font-heading text-white mb-4">{t('footer.company')}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/about" className="hover:text-primary transition-colors cursor-pointer">About Us</Link></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Careers</span></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Contact</span></li>
+              <li><Link href="/about" className="hover:text-primary transition-colors cursor-pointer">{t('footer.aboutUs')}</Link></li>
+              <li><span className="hover:text-primary transition-colors cursor-pointer">{t('footer.careers')}</span></li>
+              <li><span className="hover:text-primary transition-colors cursor-pointer">{t('footer.contact')}</span></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-heading text-white mb-4">For Restaurants</h4>
+            <h4 className="font-heading text-white mb-4">{t('footer.forRestaurants')}</h4>
             <Link href="/auth">
               <Button variant="outline" className="w-full border-white/10 text-white hover:bg-white/5 hover:text-primary hover:border-primary/50">
-                Partner Access
+                {t('footer.partnerAccess')}
               </Button>
             </Link>
           </div>
         </div>
         <div className="max-w-7xl mx-auto border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>&copy; 2025 Elite Hub. All rights reserved.</p>
+          <p>&copy; {t('footer.copyright')}</p>
           <div className="flex gap-6">
-            <span className="hover:text-white transition-colors cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-white transition-colors cursor-pointer">Terms of Service</span>
+            <span className="hover:text-white transition-colors cursor-pointer">{t('footer.privacy')}</span>
+            <span className="hover:text-white transition-colors cursor-pointer">{t('footer.terms')}</span>
           </div>
         </div>
       </footer>

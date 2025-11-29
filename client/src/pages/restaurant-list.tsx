@@ -1,18 +1,21 @@
 import { CustomerLayout } from "@/components/layout/CustomerLayout";
 import { useRestaurants, useGovernorates, useDistricts } from "@/lib/api";
 import { Link } from "wouter";
-import { Star, MapPin, Search, Filter, Loader2, Building2, Navigation, X } from "lucide-react";
+import { Star, MapPin, Search, Loader2, Building2, Navigation, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function RestaurantList() {
   const [selectedGovernorate, setSelectedGovernorate] = useState<string | undefined>();
   const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === 'ar';
   
   const { data: governorates } = useGovernorates();
   const { data: districts } = useDistricts(selectedGovernorate);
@@ -29,8 +32,13 @@ export default function RestaurantList() {
     setSearchQuery("");
   };
   
-  const selectedGovName = governorates?.find(g => g.id === selectedGovernorate)?.name;
-  const selectedDistrictName = districts?.find(d => d.id === selectedDistrict)?.name;
+  const selectedGov = governorates?.find(g => g.id === selectedGovernorate);
+  const selectedDist = districts?.find(d => d.id === selectedDistrict);
+  const selectedGovName = selectedGov ? (isArabic ? selectedGov.nameAr : selectedGov.name) : null;
+  const selectedDistrictName = selectedDist ? (isArabic ? selectedDist.nameAr : selectedDist.name) : null;
+
+  const getGovernorateName = (gov: any) => isArabic ? gov.nameAr : gov.name;
+  const getDistrictName = (district: any) => isArabic ? district.nameAr : district.name;
 
   const filteredRestaurants = restaurants?.filter(r => 
     r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -45,15 +53,15 @@ export default function RestaurantList() {
             <div>
               <h1 className="font-heading text-4xl md:text-5xl text-white mb-4">
                 {selectedDistrictName ? (
-                  <>Restaurants in <span className="text-primary">{selectedDistrictName}</span></>
+                  <>{t('restaurants.title')} - <span className="text-primary">{selectedDistrictName}</span></>
                 ) : selectedGovName ? (
-                  <>Restaurants in <span className="text-primary">{selectedGovName}</span></>
+                  <>{t('restaurants.title')} - <span className="text-primary">{selectedGovName}</span></>
                 ) : (
-                  <>All Restaurants</>
+                  <>{t('restaurants.title')}</>
                 )}
               </h1>
               <p className="text-muted-foreground text-lg">
-                Explore Egypt's finest dining establishments - مطاعم النخبة في مصر
+                {t('restaurants.subtitle')}
               </p>
             </div>
           </div>
@@ -67,12 +75,12 @@ export default function RestaurantList() {
                   className="w-[180px] bg-background/50 border-white/10"
                   data-testid="select-governorate"
                 >
-                  <SelectValue placeholder="Governorate" />
+                  <SelectValue placeholder={t('home.selectGovernorate')} />
                 </SelectTrigger>
                 <SelectContent className="bg-background/95 backdrop-blur-md border-white/10">
                   {governorates?.map((gov) => (
                     <SelectItem key={gov.id} value={gov.id}>
-                      {gov.name} - {gov.nameAr}
+                      {getGovernorateName(gov)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -90,12 +98,12 @@ export default function RestaurantList() {
                   className="w-[180px] bg-background/50 border-white/10 disabled:opacity-50"
                   data-testid="select-district"
                 >
-                  <SelectValue placeholder="District" />
+                  <SelectValue placeholder={t('home.selectDistrict')} />
                 </SelectTrigger>
                 <SelectContent className="bg-background/95 backdrop-blur-md border-white/10">
                   {districts?.map((district) => (
                     <SelectItem key={district.id} value={district.id}>
-                      {district.name} - {district.nameAr}
+                      {getDistrictName(district)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -105,7 +113,7 @@ export default function RestaurantList() {
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input 
-                placeholder="Search by name or cuisine..." 
+                placeholder={t('restaurants.searchPlaceholder')}
                 className="pl-10 bg-background/50 border-white/10 text-white focus:border-primary"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -121,7 +129,7 @@ export default function RestaurantList() {
                 onClick={clearFilters}
                 data-testid="button-clear-filters"
               >
-                <X className="w-4 h-4" /> Clear
+                <X className="w-4 h-4" /> {t('common.clearFilters')}
               </Button>
             )}
           </div>
@@ -166,10 +174,6 @@ export default function RestaurantList() {
                         {restaurant.address?.split(",")[0] || "Downtown"}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="border-white/10 text-muted-foreground text-[10px]">Valet Parking</Badge>
-                      <Badge variant="outline" className="border-white/10 text-muted-foreground text-[10px]">Private Room</Badge>
-                    </div>
                   </div>
                 </motion.div>
               </Link>
@@ -177,7 +181,8 @@ export default function RestaurantList() {
           </div>
         ) : (
           <div className="text-center py-20 text-muted-foreground">
-            <p>{searchQuery ? "No restaurants match your search." : "No restaurants available yet."}</p>
+            <p>{t('restaurants.noResults')}</p>
+            <p className="text-sm mt-2">{t('restaurants.adjustFilters')}</p>
           </div>
         )}
       </div>

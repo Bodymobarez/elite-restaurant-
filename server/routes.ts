@@ -574,7 +574,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Sequoia",
         cuisine: "Mediterranean & Oriental",
-        description: "مطعم فاخر على ضفاف النيل بإطلالة ساحرة - One of Cairo's most iconic restaurants on the Nile",
+        description: "One of Cairo's most iconic restaurants on the Nile with stunning views and exceptional cuisine",
         image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         address: "53 Abu El Feda St, Zamalek",
         governorateId: cairo.id,
@@ -588,7 +588,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Kazoku",
         cuisine: "Japanese Fine Dining",
-        description: "مطبخ ياباني راقي مع أطباق السوشي والتيبانياكي - Premium Japanese cuisine with sushi and teppanyaki",
+        description: "Premium Japanese cuisine featuring fresh sushi, sashimi, and teppanyaki in an elegant setting",
         image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
         address: "Four Seasons Nile Plaza, Garden City",
         governorateId: cairo.id,
@@ -602,7 +602,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "The Steakhouse",
         cuisine: "American Steakhouse",
-        description: "أفضل شرائح اللحم في القاهرة - Premium dry-aged steaks in an elegant setting",
+        description: "Premium dry-aged steaks and classic American dishes in an elegant, upscale setting",
         image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         address: "JW Marriott, Mirage City, New Cairo",
         governorateId: cairo.id,
@@ -616,7 +616,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Nubia Lounge",
         cuisine: "Egyptian & Nubian",
-        description: "تجربة مصرية أصيلة مع المأكولات النوبية - Authentic Egyptian and Nubian cuisine experience",
+        description: "Authentic Egyptian and Nubian cuisine experience with traditional recipes and warm hospitality",
         image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
         address: "Corniche El Nil, Maadi",
         governorateId: cairo.id,
@@ -630,7 +630,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "La Capitale",
         cuisine: "French Fine Dining",
-        description: "المطبخ الفرنسي الراقي في قلب القاهرة - Exquisite French cuisine in the heart of Cairo",
+        description: "Exquisite French cuisine in the heart of Cairo with refined flavors and impeccable service",
         image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         address: "Sofitel Cairo Nile El Gezirah, Zamalek",
         governorateId: cairo.id,
@@ -645,7 +645,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Maison Thomas",
         cuisine: "Italian & Mediterranean",
-        description: "البيتزا والباستا الإيطالية الأصيلة - Authentic Italian pizza and pasta since 1922",
+        description: "Authentic Italian pizza and pasta since 1922, a Cairo institution loved by generations",
         image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1481&q=80",
         address: "Arkan Mall, Sheikh Zayed",
         governorateId: giza.id,
@@ -659,7 +659,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Pier 88",
         cuisine: "Seafood",
-        description: "أجود المأكولات البحرية الطازجة - Fresh premium seafood with Mediterranean flair",
+        description: "Fresh premium seafood with Mediterranean flair, featuring the finest catches daily",
         image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
         address: "CityScape Mall, 6th of October",
         governorateId: giza.id,
@@ -674,7 +674,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Balbaa Village",
         cuisine: "Seafood & Grills",
-        description: "المأكولات البحرية الطازجة من البحر مباشرة - Fresh seafood straight from the Mediterranean",
+        description: "Fresh seafood straight from the Mediterranean, grilled to perfection with Egyptian spices",
         image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
         address: "San Stefano Grand Plaza, Alexandria",
         governorateId: alexandria.id,
@@ -688,7 +688,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Fish Market",
         cuisine: "Seafood",
-        description: "اختر سمكتك وسنطهيها لك - Pick your fish and we'll cook it your way",
+        description: "Pick your fish and we'll cook it your way - fresh catch from the Mediterranean daily",
         image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
         address: "Corniche, Stanley, Alexandria",
         governorateId: alexandria.id,
@@ -703,7 +703,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Moby Dick",
         cuisine: "Seafood & International",
-        description: "مطعم بحري فاخر على البحر الأحمر - Premium seafood restaurant on the Red Sea",
+        description: "Premium seafood restaurant on the Red Sea with breathtaking marina views",
         image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
         address: "El Gouna Marina",
         governorateId: redSea.id,
@@ -718,7 +718,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "La Luna",
         cuisine: "Italian Fine Dining",
-        description: "المطبخ الإيطالي الراقي مع إطلالة على البحر - Fine Italian dining with sea views",
+        description: "Fine Italian dining with spectacular sea views and romantic ambiance",
         image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         address: "Naama Bay, Sharm El Sheikh",
         governorateId: southSinai.id,
@@ -733,7 +733,7 @@ export async function registerRoutes(
         ownerId: owner.id,
         name: "Kempinski Nile",
         cuisine: "International",
-        description: "مطعم فندقي فاخر قيد المراجعة - Luxury hotel restaurant pending approval",
+        description: "Luxury hotel restaurant pending approval - world-class dining experience",
         image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         address: "Kempinski Nile Hotel, Garden City",
         governorateId: cairo.id,
@@ -743,120 +743,72 @@ export async function registerRoutes(
         status: "pending"
       });
 
-      // Create menu items for Sequoia (EGP prices)
-      await storage.createMenuItem({
-        restaurantId: sequoia.id,
-        name: "Mixed Grills Platter",
-        description: "طبق مشويات مشكلة فاخر - Premium mixed grill selection",
-        price: "850",
-        category: "Main Courses",
-        image: "https://images.unsplash.com/photo-1544025162-d76978cde07a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for Sequoia
+      await storage.createMenuItem({ restaurantId: sequoia.id, name: "Mixed Grills Platter", description: "Premium mixed grill selection with lamb chops, kofta, and chicken", price: "850", category: "Main Courses", image: "https://images.unsplash.com/photo-1544025162-d76978cde07a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: sequoia.id, name: "Hummus Beiruti", description: "Traditional Lebanese hummus with tahini and olive oil", price: "180", category: "Appetizers", image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: sequoia.id, name: "Grilled Sea Bass", description: "Grilled sea bass with Mediterranean herbs and lemon butter", price: "650", category: "Seafood", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a3a27cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: sequoia.id, name: "Kunafa", description: "Traditional kunafa with cream cheese and pistachios", price: "220", category: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80", available: true });
 
-      await storage.createMenuItem({
-        restaurantId: sequoia.id,
-        name: "Hummus Beiruti",
-        description: "حمص على الطريقة اللبنانية - Traditional Lebanese hummus",
-        price: "180",
-        category: "Appetizers",
-        image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for Kazoku
+      await storage.createMenuItem({ restaurantId: kazoku.id, name: "Omakase Sushi", description: "Chef's selection sushi platter with 12 pieces of premium fish", price: "1200", category: "Sushi", image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: kazoku.id, name: "Wagyu Teppanyaki", description: "Premium A5 Wagyu beef cooked on teppan grill", price: "1800", category: "Teppanyaki", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: kazoku.id, name: "Dragon Roll", description: "Dragon roll with avocado, eel, and spicy mayo", price: "450", category: "Sushi", image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: kazoku.id, name: "Mochi Ice Cream", description: "Assorted Japanese mochi ice cream - matcha, strawberry, mango", price: "180", category: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80", available: true });
 
-      await storage.createMenuItem({
-        restaurantId: sequoia.id,
-        name: "Grilled Sea Bass",
-        description: "قاروص مشوي مع الأعشاب - Grilled sea bass with herbs",
-        price: "650",
-        category: "Seafood",
-        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a3a27cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for The Steakhouse
+      await storage.createMenuItem({ restaurantId: steakHouse.id, name: "Ribeye Steak 400g", description: "28-day dry-aged USDA Prime ribeye steak", price: "1400", category: "Steaks", image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: steakHouse.id, name: "Filet Mignon 300g", description: "Tender filet mignon with truffle butter", price: "1600", category: "Steaks", image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: steakHouse.id, name: "Caesar Salad", description: "Classic Caesar with romaine, parmesan, and house-made dressing", price: "220", category: "Starters", image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
 
-      await storage.createMenuItem({
-        restaurantId: sequoia.id,
-        name: "Kunafa",
-        description: "كنافة بالقشطة والفستق - Traditional kunafa with cream and pistachios",
-        price: "220",
-        category: "Desserts",
-        image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80",
-        available: true
-      });
+      // Create menu items for Nubia Lounge
+      await storage.createMenuItem({ restaurantId: nubia.id, name: "Fattah", description: "Traditional Egyptian fattah with rice, bread, and meat in garlic sauce", price: "380", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: nubia.id, name: "Molokhia with Rabbit", description: "Classic Egyptian molokhia served with tender rabbit", price: "420", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: nubia.id, name: "Koshari Royal", description: "Premium koshari with extra toppings and crispy onions", price: "180", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: nubia.id, name: "Om Ali", description: "Traditional Egyptian bread pudding with nuts and cream", price: "150", category: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80", available: true });
 
-      // Create menu items for Kazoku (Japanese - EGP prices)
-      await storage.createMenuItem({
-        restaurantId: kazoku.id,
-        name: "Omakase Sushi",
-        description: "تشكيلة سوشي من اختيار الشيف - Chef's selection sushi platter",
-        price: "1200",
-        category: "Sushi",
-        image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for La Capitale
+      await storage.createMenuItem({ restaurantId: laCapitale.id, name: "Beef Bourguignon", description: "Classic French beef stew with red wine and mushrooms", price: "680", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: laCapitale.id, name: "Duck Confit", description: "Slow-cooked duck leg with orange glaze", price: "750", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: laCapitale.id, name: "French Onion Soup", description: "Classic French onion soup with gruyere crouton", price: "220", category: "Starters", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: laCapitale.id, name: "Creme Brulee", description: "Classic vanilla creme brulee with caramelized sugar", price: "180", category: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80", available: true });
 
-      await storage.createMenuItem({
-        restaurantId: kazoku.id,
-        name: "Wagyu Teppanyaki",
-        description: "لحم واغيو على الصاج الياباني - Premium Wagyu beef on hot plate",
-        price: "1800",
-        category: "Teppanyaki",
-        image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for Maison Thomas
+      await storage.createMenuItem({ restaurantId: maison.id, name: "Margherita Pizza", description: "Classic pizza with San Marzano tomatoes and fresh mozzarella", price: "280", category: "Pizza", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1481&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: maison.id, name: "Quattro Formaggi", description: "Four cheese pizza with mozzarella, gorgonzola, parmesan, fontina", price: "350", category: "Pizza", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1481&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: maison.id, name: "Spaghetti Carbonara", description: "Classic carbonara with guanciale and pecorino", price: "320", category: "Pasta", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: maison.id, name: "Tiramisu", description: "Classic Italian tiramisu with espresso and mascarpone", price: "160", category: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80", available: true });
 
-      await storage.createMenuItem({
-        restaurantId: kazoku.id,
-        name: "Dragon Roll",
-        description: "رول التنين مع الأفوكادو وسمك الأنقليس - Dragon roll with avocado and eel",
-        price: "450",
-        category: "Sushi",
-        image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for Pier 88
+      await storage.createMenuItem({ restaurantId: pier88.id, name: "Grilled Lobster", description: "Fresh lobster grilled with garlic butter", price: "1200", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: pier88.id, name: "Seafood Platter", description: "Mixed grilled seafood with shrimp, calamari, and fish", price: "950", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: pier88.id, name: "Shrimp Scampi", description: "Jumbo shrimp in white wine garlic butter sauce", price: "580", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: pier88.id, name: "Seafood Soup", description: "Creamy seafood chowder with mixed shellfish", price: "280", category: "Starters", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
 
-      await storage.createMenuItem({
-        restaurantId: kazoku.id,
-        name: "Mochi Ice Cream",
-        description: "آيس كريم موتشي ياباني - Japanese mochi ice cream",
-        price: "180",
-        category: "Desserts",
-        image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80",
-        available: true
-      });
+      // Create menu items for Balbaa Village
+      await storage.createMenuItem({ restaurantId: balbaa.id, name: "Mixed Seafood Grill", description: "Fresh catch grilled with Egyptian spices", price: "750", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: balbaa.id, name: "Fried Calamari", description: "Crispy fried calamari with tartar sauce", price: "320", category: "Appetizers", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: balbaa.id, name: "Grilled Red Snapper", description: "Whole red snapper with herbs and lemon", price: "580", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: balbaa.id, name: "Rice with Seafood", description: "Egyptian style rice with mixed seafood", price: "420", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
 
-      // Create menu items for The Steakhouse (EGP prices)
-      await storage.createMenuItem({
-        restaurantId: steakHouse.id,
-        name: "Ribeye Steak 400g",
-        description: "ريب آي ستيك معتق - Dry-aged ribeye steak",
-        price: "1400",
-        category: "Steaks",
-        image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for Fish Market
+      await storage.createMenuItem({ restaurantId: fishMarket.id, name: "Fresh Fish Selection", description: "Choose your fish, we cook it your style", price: "450", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: fishMarket.id, name: "Alexandrian Shrimp", description: "Large shrimp grilled Alexandria style", price: "550", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: fishMarket.id, name: "Stuffed Calamari", description: "Calamari stuffed with rice and herbs", price: "380", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: fishMarket.id, name: "Tahini Salad", description: "Fresh salad with tahini dressing", price: "120", category: "Appetizers", image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
 
-      await storage.createMenuItem({
-        restaurantId: steakHouse.id,
-        name: "Filet Mignon 300g",
-        description: "فيليه مينيون طري - Tender filet mignon",
-        price: "1600",
-        category: "Steaks",
-        image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for Moby Dick
+      await storage.createMenuItem({ restaurantId: moby.id, name: "Grilled Red Sea Fish", description: "Fresh catch from the Red Sea, simply grilled", price: "680", category: "Seafood", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: moby.id, name: "Seafood Risotto", description: "Creamy risotto with mixed Red Sea seafood", price: "520", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: moby.id, name: "Tuna Tartare", description: "Fresh Red Sea tuna with Asian seasonings", price: "380", category: "Starters", image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: moby.id, name: "Key Lime Pie", description: "Refreshing key lime pie with whipped cream", price: "160", category: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80", available: true });
 
-      await storage.createMenuItem({
-        restaurantId: steakHouse.id,
-        name: "Caesar Salad",
-        description: "سلطة سيزر الكلاسيكية - Classic Caesar salad",
-        price: "220",
-        category: "Starters",
-        image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        available: true
-      });
+      // Create menu items for La Luna
+      await storage.createMenuItem({ restaurantId: la.id, name: "Ossobuco alla Milanese", description: "Slow-braised veal shanks with gremolata", price: "780", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: la.id, name: "Risotto ai Frutti di Mare", description: "Seafood risotto with fresh catches from the Red Sea", price: "620", category: "Main Courses", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: la.id, name: "Burrata Caprese", description: "Fresh burrata with heirloom tomatoes and basil", price: "280", category: "Starters", image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
+      await storage.createMenuItem({ restaurantId: la.id, name: "Panna Cotta", description: "Vanilla panna cotta with berry compote", price: "180", category: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80", available: true });
 
-      res.json({ success: true, message: "تم إنشاء البيانات بنجاح - Egyptian seed data created successfully" });
+      res.json({ success: true, message: "Egyptian seed data created successfully" });
     } catch (error) {
       console.error("Seed error:", error);
       res.status(500).json({ error: "Failed to seed data" });
