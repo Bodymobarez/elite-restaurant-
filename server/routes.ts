@@ -330,16 +330,125 @@ export async function registerRoutes(
       const [restaurantCount] = await db.select({ count: count() }).from(restaurants);
       const [userCount] = await db.select({ count: count() }).from(users);
       const [orderCount] = await db.select({ count: count() }).from(orders);
+      const [reservationCount] = await db.select({ count: count() }).from(reservations);
       const [pendingCount] = await db.select({ count: count() }).from(restaurants).where(eq(restaurants.status, "pending"));
+      const [pendingReservations] = await db.select({ count: count() }).from(reservations).where(eq(reservations.status, "pending"));
       
       res.json({
         restaurants: restaurantCount.count,
         users: userCount.count,
         orders: orderCount.count,
-        pendingApprovals: pendingCount.count
+        reservations: reservationCount.count,
+        pendingApprovals: pendingCount.count,
+        pendingReservations: pendingReservations.count
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  // ========== ADMIN USER MANAGEMENT ==========
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      if (req.session.userRole !== "admin") {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      const allUsers = await storage.getAllUsers();
+      const usersWithoutPasswords = allUsers.map(({ password, ...user }) => user);
+      res.json(usersWithoutPasswords);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", async (req, res) => {
+    try {
+      if (req.session.userRole !== "admin") {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      const { role } = req.body;
+      if (role && !["customer", "restaurant_owner", "admin"].includes(role)) {
+        return res.status(400).json({ error: "Invalid role" });
+      }
+      const user = await storage.updateUser(req.params.id, req.body);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", async (req, res) => {
+    try {
+      if (req.session.userRole !== "admin") {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      if (req.params.id === req.session.userId) {
+        return res.status(400).json({ error: "Cannot delete yourself" });
+      }
+      await storage.deleteUser(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+
+  // ========== ADMIN RESERVATIONS ==========
+  app.get("/api/admin/reservations", async (req, res) => {
+    try {
+      if (req.session.userRole !== "admin") {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      const allReservations = await storage.getReservations();
+      res.json(allReservations);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reservations" });
+    }
+  });
+
+  app.patch("/api/admin/reservations/:id", async (req, res) => {
+    try {
+      if (req.session.userRole !== "admin") {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      const reservation = await storage.updateReservation(req.params.id, req.body);
+      if (!reservation) {
+        return res.status(404).json({ error: "Reservation not found" });
+      }
+      res.json(reservation);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update reservation" });
+    }
+  });
+
+  // ========== ADMIN ORDERS ==========
+  app.get("/api/admin/orders", async (req, res) => {
+    try {
+      if (req.session.userRole !== "admin") {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      const allOrders = await storage.getOrders();
+      res.json(allOrders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  app.patch("/api/admin/orders/:id", async (req, res) => {
+    try {
+      if (req.session.userRole !== "admin") {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      const order = await storage.updateOrder(req.params.id, req.body);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      res.json(order);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update order" });
     }
   });
 
