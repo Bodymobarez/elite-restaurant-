@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRestaurant, useMenu, useFavorites, useToggleFavorite } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { formatEGP } from "@/lib/currency";
 import { Star, MapPin, Clock, Share2, Heart, Plus, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -184,7 +185,7 @@ export default function RestaurantDetail() {
                       <div className="p-5">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="font-heading text-lg text-white">{item.name}</h3>
-                          <span className="font-medium text-primary">{item.price} EGP</span>
+                          <span className="font-medium text-primary">{formatEGP(item.price)}</span>
                         </div>
                         <p className="text-muted-foreground text-sm line-clamp-2">
                           {item.description || "Exquisite preparation using the finest ingredients sourced locally and internationally."}

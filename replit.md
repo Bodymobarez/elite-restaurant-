@@ -1,10 +1,18 @@
-# Elite Hub - Premium Restaurant Reservation Platform
+# Elite Hub Egypt - Premium Restaurant Reservation Platform
 
 ## Overview
 
-Elite Hub is a full-stack restaurant reservation and management platform that connects diners with premium dining establishments. The application serves three distinct user roles: customers who can browse and book reservations, restaurant owners who can manage their establishments and menus, and administrators who oversee the platform.
+Elite Hub Egypt is a full-stack restaurant reservation and management platform focused on Egypt's finest dining establishments. The application serves three distinct user roles: customers who can browse and book reservations, restaurant owners who can manage their establishments and menus, and administrators who oversee the platform.
 
-Built with a modern TypeScript stack, the application features a React frontend with Vite, an Express backend, and uses Drizzle ORM with PostgreSQL (via Neon serverless) for data persistence. The UI is built with shadcn/ui components styled with Tailwind CSS, featuring a luxury aesthetic with custom fonts (Playfair Display for headings, DM Sans for body text).
+**Egypt-Specific Features:**
+- Location-based browsing: Governorates → Districts → Restaurants hierarchy
+- Egyptian Pounds (EGP) currency throughout the application
+- Bilingual support (Arabic/English) in restaurant data
+- Famous elite restaurants seeded: Sequoia, Kazoku, La Capitale, The Steakhouse, etc.
+- 5 Governorates: Cairo, Giza, Alexandria, Red Sea, South Sinai
+- 16 Districts including Zamalek, Maadi, New Cairo, Sheikh Zayed, Sharm El Sheikh
+
+Built with a modern TypeScript stack, the application features a React frontend with Vite, an Express backend, and uses Drizzle ORM with PostgreSQL (via Neon serverless) for data persistence. The UI is built with shadcn/ui components styled with Tailwind CSS, featuring a "Dark Luxury" aesthetic with gold accent (#D4AF37), custom fonts (Playfair Display for headings, DM Sans for body text).
 
 ## User Preferences
 
@@ -74,8 +82,10 @@ Preferred communication style: Simple, everyday language.
 
 **Core Tables**
 - `users`: Authentication, profile data, role-based access
-- `restaurants`: Restaurant details, owner relationship, approval status
-- `menu_items`: Restaurant menu with pricing, categories, availability
+- `governorates`: Egyptian governorates with Arabic names (محافظات مصر)
+- `districts`: Districts within governorates with Arabic names (المناطق)
+- `restaurants`: Restaurant details with governorate/district location links, owner relationship, approval status
+- `menu_items`: Restaurant menu with pricing in EGP, categories, availability
 - `reservations`: Booking system with status tracking (pending, confirmed, cancelled, completed)
 - `orders`: Order management with status workflow (pending, preparing, ready, served, cancelled)
 - `order_items`: Line items linking orders to menu items

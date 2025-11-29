@@ -34,11 +34,13 @@ export function useRestaurants(governorateId?: string, districtId?: string) {
   const params = new URLSearchParams();
   if (governorateId) params.append("governorateId", governorateId);
   if (districtId) params.append("districtId", districtId);
+  const queryString = params.toString();
   
   return useQuery<Restaurant[]>({
-    queryKey: ["/api/restaurants", governorateId, districtId],
+    queryKey: ["/api/restaurants", governorateId || "all", districtId || "all"],
     queryFn: async () => {
-      const res = await fetch(`/api/restaurants?${params}`);
+      const url = queryString ? `/api/restaurants?${queryString}` : "/api/restaurants";
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch restaurants");
       return res.json();
     },
