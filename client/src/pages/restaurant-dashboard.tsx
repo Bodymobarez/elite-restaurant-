@@ -413,7 +413,7 @@ export default function RestaurantDashboard() {
                           </div>
                         </TableCell>
                         <TableCell className="text-muted-foreground">{item.category}</TableCell>
-                        <TableCell className="text-white">${item.price}</TableCell>
+                        <TableCell className="text-white">{item.price} EGP</TableCell>
                         <TableCell>
                           <Switch 
                             checked={item.available} 

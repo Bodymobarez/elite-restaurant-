@@ -184,7 +184,7 @@ export default function RestaurantDetail() {
                       <div className="p-5">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="font-heading text-lg text-white">{item.name}</h3>
-                          <span className="font-medium text-primary">${item.price}</span>
+                          <span className="font-medium text-primary">{item.price} EGP</span>
                         </div>
                         <p className="text-muted-foreground text-sm line-clamp-2">
                           {item.description || "Exquisite preparation using the finest ingredients sourced locally and internationally."}
