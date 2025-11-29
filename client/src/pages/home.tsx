@@ -1,14 +1,31 @@
 import { CustomerLayout } from "@/components/layout/CustomerLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import heroBg from "@assets/generated_images/atmospheric_dark_fine_dining_restaurant_interior.png";
-import { useRestaurants } from "@/lib/api";
-import { Link } from "wouter";
-import { ArrowRight, Star, MapPin, Search, Loader2 } from "lucide-react";
+import { useRestaurants, useGovernorates, useDistricts } from "@/lib/api";
+import { Link, useLocation } from "wouter";
+import { ArrowRight, Star, MapPin, Search, Loader2, Building2, Navigation } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export default function Home() {
-  const { data: restaurants, isLoading } = useRestaurants();
+  const [selectedGovernorate, setSelectedGovernorate] = useState<string | undefined>();
+  const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>();
+  const [, navigate] = useLocation();
+  
+  const { data: governorates } = useGovernorates();
+  const { data: districts } = useDistricts(selectedGovernorate);
+  const { data: restaurants, isLoading } = useRestaurants(selectedGovernorate, selectedDistrict);
+  
+  const handleGovernorateChange = (value: string) => {
+    setSelectedGovernorate(value);
+    setSelectedDistrict(undefined);
+  };
+  
+  const handleDistrictChange = (value: string) => {
+    setSelectedDistrict(value);
+  };
 
   return (
     <CustomerLayout>
@@ -30,27 +47,84 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-medium text-white mb-6 tracking-tight leading-tight">
-              Taste the <span className="text-primary italic">Extraordinary</span>
+              Elite <span className="text-primary italic">مصر</span>
             </h1>
             <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-              Discover the city's most exclusive culinary destinations. Reserve your table at top-rated restaurants with just a tap.
+              Discover Egypt's most exclusive culinary destinations. From Cairo's finest rooftops to Alexandria's seafood gems.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto w-full">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input 
-                  placeholder="Search for cuisine or restaurant..." 
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 pl-10 h-12 rounded-full backdrop-blur-md focus-visible:ring-primary/50 focus-visible:border-primary"
-                  data-testid="input-search"
-                />
+            {/* Location Selection */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-2xl mx-auto w-full">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Building2 className="w-5 h-5 text-primary hidden sm:block" />
+                <Select value={selectedGovernorate} onValueChange={handleGovernorateChange}>
+                  <SelectTrigger 
+                    className="w-full sm:w-[200px] h-12 bg-white/10 border-white/20 text-white backdrop-blur-md rounded-full focus:ring-primary/50"
+                    data-testid="select-governorate"
+                  >
+                    <SelectValue placeholder="Select Governorate" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background/95 backdrop-blur-md border-white/10">
+                    {governorates?.map((gov) => (
+                      <SelectItem key={gov.id} value={gov.id} data-testid={`option-gov-${gov.id}`}>
+                        {gov.name} - {gov.nameAr}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+              
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Navigation className="w-5 h-5 text-primary hidden sm:block" />
+                <Select 
+                  value={selectedDistrict} 
+                  onValueChange={handleDistrictChange}
+                  disabled={!selectedGovernorate}
+                >
+                  <SelectTrigger 
+                    className="w-full sm:w-[200px] h-12 bg-white/10 border-white/20 text-white backdrop-blur-md rounded-full focus:ring-primary/50 disabled:opacity-50"
+                    data-testid="select-district"
+                  >
+                    <SelectValue placeholder="Select District" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background/95 backdrop-blur-md border-white/10">
+                    {districts?.map((district) => (
+                      <SelectItem key={district.id} value={district.id} data-testid={`option-district-${district.id}`}>
+                        {district.name} - {district.nameAr}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <Link href="/restaurants">
                 <Button size="lg" className="rounded-full h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-medium" data-testid="button-explore">
                   Explore
                 </Button>
               </Link>
             </div>
+            
+            {/* Clear filters */}
+            {(selectedGovernorate || selectedDistrict) && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mt-4"
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/60 hover:text-white"
+                  onClick={() => {
+                    setSelectedGovernorate(undefined);
+                    setSelectedDistrict(undefined);
+                  }}
+                  data-testid="button-clear-filters"
+                >
+                  Clear Filters
+                </Button>
+              </motion.div>
+            )}
           </motion.div>
         </div>
       </section>

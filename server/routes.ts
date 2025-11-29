@@ -488,62 +488,86 @@ export async function registerRoutes(
     try {
       const hashedPassword = await hash("password123", 10);
       
-      // Create Egyptian Governorates
-      const cairo = await storage.createGovernorate({ name: "Cairo", nameAr: "القاهرة" });
-      const giza = await storage.createGovernorate({ name: "Giza", nameAr: "الجيزة" });
-      const alexandria = await storage.createGovernorate({ name: "Alexandria", nameAr: "الإسكندرية" });
-      const redSea = await storage.createGovernorate({ name: "Red Sea", nameAr: "البحر الأحمر" });
-      const southSinai = await storage.createGovernorate({ name: "South Sinai", nameAr: "جنوب سيناء" });
+      // Get or create Egyptian Governorates
+      const existingGovs = await storage.getGovernorates();
+      let cairo = existingGovs.find(g => g.name === "Cairo");
+      let giza = existingGovs.find(g => g.name === "Giza");
+      let alexandria = existingGovs.find(g => g.name === "Alexandria");
+      let redSea = existingGovs.find(g => g.name === "Red Sea");
+      let southSinai = existingGovs.find(g => g.name === "South Sinai");
+      
+      if (!cairo) cairo = await storage.createGovernorate({ name: "Cairo", nameAr: "القاهرة" });
+      if (!giza) giza = await storage.createGovernorate({ name: "Giza", nameAr: "الجيزة" });
+      if (!alexandria) alexandria = await storage.createGovernorate({ name: "Alexandria", nameAr: "الإسكندرية" });
+      if (!redSea) redSea = await storage.createGovernorate({ name: "Red Sea", nameAr: "البحر الأحمر" });
+      if (!southSinai) southSinai = await storage.createGovernorate({ name: "South Sinai", nameAr: "جنوب سيناء" });
+
+      // Helper to find or create district
+      const existingDistricts = await storage.getDistricts();
+      const findOrCreateDistrict = async (govId: string, name: string, nameAr: string) => {
+        const existing = existingDistricts.find(d => d.name === name && d.governorateId === govId);
+        if (existing) return existing;
+        return storage.createDistrict({ governorateId: govId, name, nameAr });
+      };
 
       // Cairo Districts
-      const zamalek = await storage.createDistrict({ governorateId: cairo.id, name: "Zamalek", nameAr: "الزمالك" });
-      const maadi = await storage.createDistrict({ governorateId: cairo.id, name: "Maadi", nameAr: "المعادي" });
-      const heliopolis = await storage.createDistrict({ governorateId: cairo.id, name: "Heliopolis", nameAr: "مصر الجديدة" });
-      const newCairo = await storage.createDistrict({ governorateId: cairo.id, name: "New Cairo", nameAr: "القاهرة الجديدة" });
-      const gardenCity = await storage.createDistrict({ governorateId: cairo.id, name: "Garden City", nameAr: "جاردن سيتي" });
-      const downtown = await storage.createDistrict({ governorateId: cairo.id, name: "Downtown", nameAr: "وسط البلد" });
+      const zamalek = await findOrCreateDistrict(cairo.id, "Zamalek", "الزمالك");
+      const maadi = await findOrCreateDistrict(cairo.id, "Maadi", "المعادي");
+      const heliopolis = await findOrCreateDistrict(cairo.id, "Heliopolis", "مصر الجديدة");
+      const newCairo = await findOrCreateDistrict(cairo.id, "New Cairo", "القاهرة الجديدة");
+      const gardenCity = await findOrCreateDistrict(cairo.id, "Garden City", "جاردن سيتي");
+      const downtown = await findOrCreateDistrict(cairo.id, "Downtown", "وسط البلد");
 
       // Giza Districts
-      const sheikh = await storage.createDistrict({ governorateId: giza.id, name: "Sheikh Zayed", nameAr: "الشيخ زايد" });
-      const october = await storage.createDistrict({ governorateId: giza.id, name: "6th of October", nameAr: "السادس من أكتوبر" });
-      const dokki = await storage.createDistrict({ governorateId: giza.id, name: "Dokki", nameAr: "الدقي" });
-      const mohandessin = await storage.createDistrict({ governorateId: giza.id, name: "Mohandessin", nameAr: "المهندسين" });
+      const sheikh = await findOrCreateDistrict(giza.id, "Sheikh Zayed", "الشيخ زايد");
+      const october = await findOrCreateDistrict(giza.id, "6th of October", "السادس من أكتوبر");
+      const dokki = await findOrCreateDistrict(giza.id, "Dokki", "الدقي");
+      const mohandessin = await findOrCreateDistrict(giza.id, "Mohandessin", "المهندسين");
 
       // Alexandria Districts
-      const sanStefano = await storage.createDistrict({ governorateId: alexandria.id, name: "San Stefano", nameAr: "سان ستيفانو" });
-      const stanley = await storage.createDistrict({ governorateId: alexandria.id, name: "Stanley", nameAr: "ستانلي" });
-      const gleem = await storage.createDistrict({ governorateId: alexandria.id, name: "Gleem", nameAr: "جليم" });
+      const sanStefano = await findOrCreateDistrict(alexandria.id, "San Stefano", "سان ستيفانو");
+      const stanley = await findOrCreateDistrict(alexandria.id, "Stanley", "ستانلي");
+      const gleem = await findOrCreateDistrict(alexandria.id, "Gleem", "جليم");
 
       // Red Sea Districts
-      const hurghada = await storage.createDistrict({ governorateId: redSea.id, name: "Hurghada", nameAr: "الغردقة" });
-      const elGouna = await storage.createDistrict({ governorateId: redSea.id, name: "El Gouna", nameAr: "الجونة" });
+      const hurghada = await findOrCreateDistrict(redSea.id, "Hurghada", "الغردقة");
+      const elGouna = await findOrCreateDistrict(redSea.id, "El Gouna", "الجونة");
 
       // South Sinai Districts
-      const sharmElSheikh = await storage.createDistrict({ governorateId: southSinai.id, name: "Sharm El Sheikh", nameAr: "شرم الشيخ" });
+      const sharmElSheikh = await findOrCreateDistrict(southSinai.id, "Sharm El Sheikh", "شرم الشيخ");
 
-      // Create admin user
-      const admin = await storage.createUser({
-        email: "admin@elite.com",
-        password: hashedPassword,
-        name: "مدير النظام",
-        role: "admin"
-      });
+      // Get or create admin user
+      let admin = await storage.getUserByEmail("admin@elite.com");
+      if (!admin) {
+        admin = await storage.createUser({
+          email: "admin@elite.com",
+          password: hashedPassword,
+          name: "مدير النظام",
+          role: "admin"
+        });
+      }
 
-      // Create restaurant owner
-      const owner = await storage.createUser({
-        email: "owner@elite.com", 
-        password: hashedPassword,
-        name: "صاحب المطعم",
-        role: "restaurant_owner"
-      });
+      // Get or create restaurant owner
+      let owner = await storage.getUserByEmail("owner@elite.com");
+      if (!owner) {
+        owner = await storage.createUser({
+          email: "owner@elite.com", 
+          password: hashedPassword,
+          name: "صاحب المطعم",
+          role: "restaurant_owner"
+        });
+      }
 
-      // Create customer
-      const customer = await storage.createUser({
-        email: "user@elite.com",
-        password: hashedPassword,
-        name: "أحمد محمد",
-        role: "customer"
-      });
+      // Get or create customer
+      let customer = await storage.getUserByEmail("user@elite.com");
+      if (!customer) {
+        customer = await storage.createUser({
+          email: "user@elite.com",
+          password: hashedPassword,
+          name: "أحمد محمد",
+          role: "customer"
+        });
+      }
 
       // Famous Elite Restaurants in Egypt - Cairo
       const sequoia = await storage.createRestaurant({

@@ -1,12 +1,44 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "./queryClient";
-import type { Restaurant, MenuItem, Reservation, Order } from "@shared/schema";
+import type { Restaurant, MenuItem, Reservation, Order, Governorate, District } from "@shared/schema";
 
-export function useRestaurants() {
-  return useQuery<Restaurant[]>({
-    queryKey: ["/api/restaurants"],
+// ========== LOCATION HOOKS ==========
+
+export function useGovernorates() {
+  return useQuery<Governorate[]>({
+    queryKey: ["/api/governorates"],
     queryFn: async () => {
-      const res = await fetch("/api/restaurants");
+      const res = await fetch("/api/governorates");
+      if (!res.ok) throw new Error("Failed to fetch governorates");
+      return res.json();
+    },
+  });
+}
+
+export function useDistricts(governorateId?: string) {
+  return useQuery<District[]>({
+    queryKey: ["/api/districts", governorateId],
+    queryFn: async () => {
+      const params = governorateId ? `?governorateId=${governorateId}` : "";
+      const res = await fetch(`/api/districts${params}`);
+      if (!res.ok) throw new Error("Failed to fetch districts");
+      return res.json();
+    },
+    enabled: !!governorateId,
+  });
+}
+
+// ========== RESTAURANT HOOKS ==========
+
+export function useRestaurants(governorateId?: string, districtId?: string) {
+  const params = new URLSearchParams();
+  if (governorateId) params.append("governorateId", governorateId);
+  if (districtId) params.append("districtId", districtId);
+  
+  return useQuery<Restaurant[]>({
+    queryKey: ["/api/restaurants", governorateId, districtId],
+    queryFn: async () => {
+      const res = await fetch(`/api/restaurants?${params}`);
       if (!res.ok) throw new Error("Failed to fetch restaurants");
       return res.json();
     },
