@@ -83,6 +83,7 @@ export function useOrders(restaurantId?: string) {
       if (!res.ok) throw new Error("Failed to fetch orders");
       return res.json();
     },
+    enabled: !!restaurantId,
   });
 }
 

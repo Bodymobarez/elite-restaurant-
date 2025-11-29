@@ -2,49 +2,109 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2, Store } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useCreateRestaurant } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 const restaurantSchema = z.object({
   name: z.string().min(2, "Restaurant name is required"),
-  email: z.string().email("Invalid email"),
   cuisine: z.string().min(2, "Cuisine type is required"),
   address: z.string().min(10, "Complete address is required"),
   phone: z.string().min(10, "Valid phone number is required"),
-  description: z.string().min(50, "Description must be at least 50 characters"),
+  description: z.string().min(20, "Description must be at least 20 characters"),
+  priceRange: z.string().min(1, "Price range is required"),
+  image: z.string().optional(),
 });
 
 export default function RestaurantOnboarding() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [, navigate] = useLocation();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const createRestaurant = useCreateRestaurant();
+
   const form = useForm<z.infer<typeof restaurantSchema>>({
     resolver: zodResolver(restaurantSchema),
     defaultValues: {
       name: "",
-      email: "",
       cuisine: "",
       address: "",
       phone: "",
       description: "",
+      priceRange: "$$$",
+      image: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof restaurantSchema>) {
-    console.log(values);
-    setCurrentStep(4); // Show success
+  async function onSubmit(values: z.infer<typeof restaurantSchema>) {
+    try {
+      await createRestaurant.mutateAsync({
+        name: values.name,
+        cuisine: values.cuisine,
+        address: values.address,
+        phone: values.phone,
+        description: values.description,
+        priceRange: values.priceRange,
+        image: values.image || undefined,
+      });
+      setCurrentStep(4);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to submit restaurant application. Please try again.",
+      });
+    }
   }
 
   const steps = [
     { number: 1, title: "Basic Info", icon: "📋" },
     { number: 2, title: "Contact", icon: "📞" },
-    { number: 3, title: "About", icon: "📝" },
+    { number: 3, title: "Details", icon: "📝" },
     { number: 4, title: "Complete", icon: "✓" },
   ];
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+        <Card className="bg-card/50 border-white/5 backdrop-blur-sm max-w-md w-full text-center">
+          <CardContent className="pt-8 pb-8">
+            <Store className="w-16 h-16 text-primary mx-auto mb-6" />
+            <h2 className="font-heading text-2xl text-white mb-4">Sign In Required</h2>
+            <p className="text-muted-foreground mb-6">Please sign in as a restaurant owner to register your establishment.</p>
+            <Button onClick={() => navigate("/auth")} className="bg-primary text-primary-foreground">
+              Sign In
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (user.role !== "restaurant_owner") {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+        <Card className="bg-card/50 border-white/5 backdrop-blur-sm max-w-md w-full text-center">
+          <CardContent className="pt-8 pb-8">
+            <Store className="w-16 h-16 text-amber-500 mx-auto mb-6" />
+            <h2 className="font-heading text-2xl text-white mb-4">Restaurant Owner Account Required</h2>
+            <p className="text-muted-foreground mb-6">Only restaurant owners can register establishments. Please create a restaurant owner account.</p>
+            <Button onClick={() => navigate("/auth")} className="bg-primary text-primary-foreground">
+              Create Account
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
@@ -77,7 +137,7 @@ export default function RestaurantOnboarding() {
         {currentStep < 4 ? (
           <Card className="bg-card/50 border-white/5 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-white">{steps[currentStep - 1].title}</CardTitle>
+              <CardTitle className="text-white font-heading">{steps[currentStep - 1].title}</CardTitle>
               <CardDescription>Fill in your restaurant details</CardDescription>
             </CardHeader>
             <CardContent>
@@ -89,7 +149,7 @@ export default function RestaurantOnboarding() {
                         <FormItem>
                           <FormLabel className="text-white/80">Restaurant Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., Lumière" {...field} className="bg-background/50 border-white/10 text-white" />
+                            <Input placeholder="e.g., Lumière" {...field} className="bg-background/50 border-white/10 text-white" data-testid="input-restaurant-name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -98,8 +158,27 @@ export default function RestaurantOnboarding() {
                         <FormItem>
                           <FormLabel className="text-white/80">Cuisine Type</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., French Fine Dining" {...field} className="bg-background/50 border-white/10 text-white" />
+                            <Input placeholder="e.g., French Fine Dining" {...field} className="bg-background/50 border-white/10 text-white" data-testid="input-cuisine" />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="priceRange" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white/80">Price Range</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-background/50 border-white/10 text-white" data-testid="select-price-range">
+                                <SelectValue placeholder="Select price range" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-card border-white/10">
+                              <SelectItem value="$">$ - Budget Friendly</SelectItem>
+                              <SelectItem value="$$">$$ - Moderate</SelectItem>
+                              <SelectItem value="$$$">$$$ - Upscale</SelectItem>
+                              <SelectItem value="$$$$">$$$$ - Fine Dining</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )} />
@@ -108,20 +187,11 @@ export default function RestaurantOnboarding() {
 
                   {currentStep === 2 && (
                     <>
-                      <FormField control={form.control} name="email" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-white/80">Email Address</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="contact@restaurant.com" {...field} className="bg-background/50 border-white/10 text-white" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
                       <FormField control={form.control} name="phone" render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-white/80">Phone Number</FormLabel>
                           <FormControl>
-                            <Input placeholder="+1 (555) 000-0000" {...field} className="bg-background/50 border-white/10 text-white" />
+                            <Input placeholder="+1 (555) 000-0000" {...field} className="bg-background/50 border-white/10 text-white" data-testid="input-phone" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -130,7 +200,16 @@ export default function RestaurantOnboarding() {
                         <FormItem>
                           <FormLabel className="text-white/80">Full Address</FormLabel>
                           <FormControl>
-                            <Input placeholder="Street, City, State, ZIP" {...field} className="bg-background/50 border-white/10 text-white" />
+                            <Input placeholder="Street, City, State, ZIP" {...field} className="bg-background/50 border-white/10 text-white" data-testid="input-address" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="image" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white/80">Restaurant Image URL (optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://..." {...field} className="bg-background/50 border-white/10 text-white" data-testid="input-image" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -143,7 +222,7 @@ export default function RestaurantOnboarding() {
                       <FormItem>
                         <FormLabel className="text-white/80">Tell Us About Your Restaurant</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Describe your restaurant's ambiance, signature dishes, and dining philosophy..." {...field} className="bg-background/50 border-white/10 text-white min-h-40" />
+                          <Textarea placeholder="Describe your restaurant's ambiance, signature dishes, and dining philosophy..." {...field} className="bg-background/50 border-white/10 text-white min-h-40" data-testid="input-description" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -157,6 +236,7 @@ export default function RestaurantOnboarding() {
                       className="border-white/10 text-white hover:bg-white/5"
                       onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
                       disabled={currentStep === 1}
+                      data-testid="button-back"
                     >
                       Back
                     </Button>
@@ -164,8 +244,16 @@ export default function RestaurantOnboarding() {
                       type={currentStep === 3 ? "submit" : "button"}
                       className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
                       onClick={() => currentStep < 3 && setCurrentStep(currentStep + 1)}
+                      disabled={createRestaurant.isPending}
+                      data-testid="button-continue"
                     >
-                      {currentStep === 3 ? "Submit" : "Continue"} <ArrowRight className="w-4 h-4" />
+                      {createRestaurant.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          {currentStep === 3 ? "Submit Application" : "Continue"} <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
                     </Button>
                   </div>
                 </form>
@@ -176,12 +264,26 @@ export default function RestaurantOnboarding() {
           <div className="text-center">
             <CheckCircle2 className="w-20 h-20 text-emerald-500 mx-auto mb-6 animate-bounce" />
             <h2 className="font-heading text-4xl text-white mb-2">Application Submitted!</h2>
-            <p className="text-muted-foreground mb-8">
-              Thank you for joining Elite Hub. Our team will review your application and contact you within 48 hours.
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              Thank you for joining Elite Hub. Your restaurant is now pending approval. Our team will review your application shortly.
             </p>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Return to Home
-            </Button>
+            <div className="flex gap-4 justify-center">
+              <Button 
+                variant="outline"
+                className="border-white/10 text-white hover:bg-white/5"
+                onClick={() => navigate("/")}
+                data-testid="button-home"
+              >
+                Return to Home
+              </Button>
+              <Button 
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={() => navigate("/dashboard")}
+                data-testid="button-dashboard"
+              >
+                Go to Dashboard
+              </Button>
+            </div>
           </div>
         )}
       </div>
