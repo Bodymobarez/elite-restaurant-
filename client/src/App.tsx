@@ -6,9 +6,13 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Auth from "@/pages/auth";
 import RestaurantList from "@/pages/restaurant-list";
+import RestaurantDetail from "@/pages/restaurant-detail";
+import About from "@/pages/about";
+import UserProfile from "@/pages/user-profile";
+import BookingConfirmation from "@/pages/booking-confirmation";
+import RestaurantOnboarding from "@/pages/restaurant-onboarding";
 import AdminDashboard from "@/pages/admin-dashboard";
 import RestaurantDashboard from "@/pages/restaurant-dashboard";
-import RestaurantDetail from "@/pages/restaurant-detail";
 
 function Router() {
   return (
@@ -18,15 +22,19 @@ function Router() {
       <Route path="/auth" component={Auth} />
       <Route path="/restaurants" component={RestaurantList} />
       <Route path="/restaurants/:id" component={RestaurantDetail} />
+      <Route path="/about" component={About} />
+      <Route path="/profile" component={UserProfile} />
+      <Route path="/booking-confirmation" component={BookingConfirmation} />
+      <Route path="/onboarding" component={RestaurantOnboarding} />
       
       {/* Admin Routes */}
       <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/restaurants" component={AdminDashboard} /> {/* Reuse for demo */}
+      <Route path="/admin/restaurants" component={AdminDashboard} />
       
       {/* Restaurant Owner Routes */}
       <Route path="/dashboard" component={RestaurantDashboard} />
-      <Route path="/dashboard/menu" component={RestaurantDashboard} /> {/* Reuse for demo */}
-      <Route path="/dashboard/orders" component={RestaurantDashboard} /> {/* Reuse for demo */}
+      <Route path="/dashboard/menu" component={RestaurantDashboard} />
+      <Route path="/dashboard/orders" component={RestaurantDashboard} />
 
       <Route component={NotFound} />
     </Switch>

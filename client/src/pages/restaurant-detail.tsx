@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams } from "wouter";
 import { CustomerLayout } from "@/components/layout/CustomerLayout";
 import { Button } from "@/components/ui/button";
@@ -6,16 +7,27 @@ import { restaurants, menuItems } from "@/lib/mockData";
 import { Star, MapPin, Clock, Share2, Heart, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { BookingModal } from "@/components/BookingModal";
 
 export default function RestaurantDetail() {
   const { id } = useParams();
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
   const { toast } = useToast();
-  const restaurant = restaurants.find(r => r.id === id) || restaurants[0]; // Fallback for demo
+  const restaurant = restaurants.find(r => r.id === id) || restaurants[0];
 
   const handleAddToCart = (item: string) => {
     toast({
       title: "Added to Order",
       description: `${item} has been added to your cart.`,
+    });
+  };
+
+  const handleFavorite = () => {
+    setIsFavorited(!isFavorited);
+    toast({
+      title: isFavorited ? "Removed from Favorites" : "Added to Favorites",
+      description: `${restaurant.name} has been ${isFavorited ? "removed from" : "added to"} your favorites.`,
     });
   };
 
@@ -30,7 +42,7 @@ export default function RestaurantDetail() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 max-w-7xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 max-w-7xl mx-auto w-full">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6">
             <div>
               <div className="flex items-center gap-3 mb-3">
@@ -49,13 +61,27 @@ export default function RestaurantDetail() {
             </div>
             
             <div className="flex gap-3">
-              <Button variant="outline" size="icon" className="rounded-full border-white/20 text-white hover:bg-white/10 hover:text-white">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full border-white/20 text-white hover:bg-white/10 hover:text-white"
+                onClick={() => {}}
+              >
                 <Share2 className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="icon" className="rounded-full border-white/20 text-white hover:bg-white/10 hover:text-white">
-                <Heart className="w-4 h-4" />
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full border-white/20 text-white hover:bg-white/10 hover:text-white"
+                onClick={handleFavorite}
+              >
+                <Heart className={`w-4 h-4 ${isFavorited ? "fill-primary" : ""}`} />
               </Button>
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8">
+              <Button 
+                size="lg" 
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8"
+                onClick={() => setBookingOpen(true)}
+              >
                 Book a Table
               </Button>
             </div>
@@ -111,7 +137,6 @@ export default function RestaurantDetail() {
                   </div>
                 ))}
                 
-                {/* Add dummy items if category empty for demo */}
                 {menuItems.filter(item => item.category === category).length === 0 && (
                   <div className="col-span-full py-12 text-center text-muted-foreground italic">
                     Seasonal menu items for this category are being updated.
@@ -122,6 +147,12 @@ export default function RestaurantDetail() {
           ))}
         </Tabs>
       </div>
+
+      <BookingModal 
+        open={bookingOpen} 
+        onOpenChange={setBookingOpen}
+        restaurantName={restaurant.name}
+      />
     </CustomerLayout>
   );
 }
