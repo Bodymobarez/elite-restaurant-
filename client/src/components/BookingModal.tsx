@@ -2,32 +2,36 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Users, Clock } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useCreateReservation } from "@/lib/api";
 
 const bookingSchema = z.object({
   date: z.string().min(1, "Please select a date"),
   time: z.string().min(1, "Please select a time"),
   guests: z.string().min(1, "Please select number of guests"),
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Valid email is required"),
-  phone: z.string().min(10, "Valid phone number is required"),
+  specialRequests: z.string().optional(),
 });
 
 interface BookingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   restaurantName: string;
+  restaurantId: string;
 }
 
-export function BookingModal({ open, onOpenChange, restaurantName }: BookingModalProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function BookingModal({ open, onOpenChange, restaurantName, restaurantId }: BookingModalProps) {
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const createReservation = useCreateReservation();
   
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
@@ -35,23 +39,46 @@ export function BookingModal({ open, onOpenChange, restaurantName }: BookingModa
       date: "",
       time: "",
       guests: "",
-      name: "",
-      email: "",
-      phone: "",
+      specialRequests: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof bookingSchema>) {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+  async function onSubmit(values: z.infer<typeof bookingSchema>) {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Please sign in",
+        description: "You need to be logged in to make a reservation.",
+      });
+      onOpenChange(false);
+      setLocation("/auth");
+      return;
+    }
+
+    try {
+      const reservation = await createReservation.mutateAsync({
+        userId: user.id,
+        restaurantId,
+        date: values.date,
+        time: values.time,
+        partySize: parseInt(values.guests),
+        specialRequests: values.specialRequests || undefined,
+      });
+      
       toast({
         title: "Reservation Confirmed!",
-        description: "Your booking at " + restaurantName + " has been confirmed.",
+        description: `Your booking at ${restaurantName} has been confirmed. Confirmation code: ${reservation.confirmationCode}`,
       });
       onOpenChange(false);
       form.reset();
-    }, 1500);
+      setLocation(`/booking-confirmation?code=${reservation.confirmationCode}`);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Booking failed",
+        description: "Could not complete your reservation. Please try again.",
+      });
+    }
   }
 
   return (
@@ -71,7 +98,12 @@ export function BookingModal({ open, onOpenChange, restaurantName }: BookingModa
                 <FormItem>
                   <FormLabel className="text-white/80 text-xs">Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} className="bg-background/50 border-white/10 text-white" />
+                    <Input 
+                      type="date" 
+                      {...field} 
+                      className="bg-background/50 border-white/10 text-white"
+                      data-testid="input-booking-date"
+                    />
                   </FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -82,7 +114,7 @@ export function BookingModal({ open, onOpenChange, restaurantName }: BookingModa
                   <FormLabel className="text-white/80 text-xs">Time</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
-                      <SelectTrigger className="bg-background/50 border-white/10 text-white">
+                      <SelectTrigger className="bg-background/50 border-white/10 text-white" data-testid="select-booking-time">
                         <SelectValue placeholder="Select time" />
                       </SelectTrigger>
                     </FormControl>
@@ -101,7 +133,7 @@ export function BookingModal({ open, onOpenChange, restaurantName }: BookingModa
                   <FormLabel className="text-white/80 text-xs">Guests</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
-                      <SelectTrigger className="bg-background/50 border-white/10 text-white">
+                      <SelectTrigger className="bg-background/50 border-white/10 text-white" data-testid="select-booking-guests">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                     </FormControl>
@@ -116,39 +148,26 @@ export function BookingModal({ open, onOpenChange, restaurantName }: BookingModa
               )} />
             </div>
 
-            <div className="border-t border-white/5 pt-4">
-              <h4 className="font-heading text-white mb-4">Contact Information</h4>
-              
-              <FormField control={form.control} name="name" render={({ field }) => (
-                <FormItem className="mb-3">
-                  <FormLabel className="text-white/80 text-sm">Full Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your name" {...field} className="bg-background/50 border-white/10 text-white" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+            <FormField control={form.control} name="specialRequests" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white/80 text-sm">Special Requests (Optional)</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Any dietary restrictions, celebrations, or special requests..." 
+                    {...field} 
+                    className="bg-background/50 border-white/10 text-white resize-none"
+                    data-testid="textarea-special-requests"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
 
-              <FormField control={form.control} name="email" render={({ field }) => (
-                <FormItem className="mb-3">
-                  <FormLabel className="text-white/80 text-sm">Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="your@email.com" {...field} className="bg-background/50 border-white/10 text-white" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField control={form.control} name="phone" render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white/80 text-sm">Phone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+1 (555) 000-0000" {...field} className="bg-background/50 border-white/10 text-white" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            </div>
+            {!user && (
+              <div className="text-sm text-muted-foreground bg-white/5 rounded-lg p-3 border border-white/10">
+                Please sign in to complete your booking. Your reservation details will be saved.
+              </div>
+            )}
 
             <div className="flex gap-3 pt-4">
               <Button 
@@ -156,15 +175,17 @@ export function BookingModal({ open, onOpenChange, restaurantName }: BookingModa
                 variant="outline" 
                 className="flex-1 border-white/10 text-white hover:bg-white/5"
                 onClick={() => onOpenChange(false)}
+                data-testid="button-cancel-booking"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
                 className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-                disabled={isSubmitting}
+                disabled={createReservation.isPending}
+                data-testid="button-confirm-booking"
               >
-                {isSubmitting ? "Confirming..." : "Confirm Booking"}
+                {createReservation.isPending ? "Confirming..." : "Confirm Booking"}
               </Button>
             </div>
           </form>

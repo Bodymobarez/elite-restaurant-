@@ -22,7 +22,12 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Email already registered" });
       }
       const hashedPassword = await hash(data.password, 10);
-      const user = await storage.createUser({ ...data, password: hashedPassword });
+      const allowedRole = data.role === "restaurant_owner" ? "restaurant_owner" : "customer";
+      const user = await storage.createUser({ 
+        ...data, 
+        password: hashedPassword,
+        role: allowedRole
+      });
       const { password, ...userWithoutPassword } = user;
       req.session.userId = user.id;
       req.session.userRole = user.role;

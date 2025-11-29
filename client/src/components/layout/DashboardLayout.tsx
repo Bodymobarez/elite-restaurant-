@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import logo from "@assets/generated_images/minimalist_gold_luxury_logo_icon.png";
 import { 
@@ -15,14 +14,16 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { currentUser } from "@/lib/mockData";
-
-type SidebarProps = {
-  role: "admin" | "restaurant";
-};
+import { useAuth } from "@/lib/auth";
 
 export function DashboardLayout({ children, role = "admin" }: { children: React.ReactNode, role?: "admin" | "restaurant" }) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    setLocation("/");
+  };
 
   const adminLinks = [
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
@@ -65,7 +66,7 @@ export function DashboardLayout({ children, role = "admin" }: { children: React.
                 isActive 
                   ? "bg-sidebar-primary/10 text-sidebar-primary border border-sidebar-primary/20 shadow-[0_0_15px_rgba(212,175,55,0.1)]" 
                   : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              )}>
+              )} data-testid={`nav-${link.label.toLowerCase().replace(/\s+/g, '-')}`}>
                 <Icon className={cn("w-4 h-4", isActive ? "text-sidebar-primary" : "text-muted-foreground group-hover:text-sidebar-foreground")} />
                 {link.label}
               </Link>
@@ -76,20 +77,25 @@ export function DashboardLayout({ children, role = "admin" }: { children: React.
         <div className="p-4 border-t border-sidebar-border">
            <div className="flex items-center gap-3 px-2 mb-4">
              <Avatar className="h-9 w-9 border border-white/10">
-               <AvatarImage src={currentUser.avatar} />
-               <AvatarFallback>AD</AvatarFallback>
+               <AvatarImage src={user?.avatar || undefined} />
+               <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                 {user?.name?.slice(0, 2).toUpperCase() || "U"}
+               </AvatarFallback>
              </Avatar>
              <div className="flex-1 min-w-0">
-               <p className="text-sm font-medium truncate text-sidebar-foreground">{currentUser.name}</p>
+               <p className="text-sm font-medium truncate text-sidebar-foreground">{user?.name || "User"}</p>
                <p className="text-xs text-muted-foreground truncate capitalize">{role}</p>
              </div>
            </div>
-           <Link href="/auth">
-            <Button variant="outline" className="w-full justify-start gap-2 border-white/10 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-colors text-muted-foreground">
+           <Button 
+             variant="outline" 
+             className="w-full justify-start gap-2 border-white/10 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-colors text-muted-foreground"
+             onClick={handleLogout}
+             data-testid="button-signout"
+           >
               <LogOut className="w-4 h-4" />
               Sign Out
-            </Button>
-           </Link>
+           </Button>
         </div>
       </aside>
 

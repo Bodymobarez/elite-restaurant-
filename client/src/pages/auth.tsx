@@ -6,54 +6,98 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import logo from "@assets/generated_images/minimalist_gold_luxury_logo_icon.png";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
 
-const formSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+});
+
+const registerSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  role: z.enum(["customer", "restaurant_owner"]),
 });
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { login, register } = useAuth();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+  const loginForm = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const registerForm = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { name: "", email: "", password: "", role: "customer" },
+  });
+
+  async function onLogin(values: z.infer<typeof loginSchema>) {
     setIsLoading(true);
-    
-    // Mock authentication logic
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const user = await login(values.email, values.password);
       toast({
         title: "Welcome back",
         description: "You have successfully logged in.",
       });
-
-      // Simple mock routing based on email
-      if (values.email.includes("admin")) {
+      if (user.role === "admin") {
         setLocation("/admin");
-      } else if (values.email.includes("rest")) {
+      } else if (user.role === "restaurant_owner") {
         setLocation("/dashboard");
       } else {
         setLocation("/");
       }
-    }, 1500);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: error.message || "Invalid credentials",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function onRegister(values: z.infer<typeof registerSchema>) {
+    setIsLoading(true);
+    try {
+      const user = await register({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        role: values.role,
+      });
+      toast({
+        title: "Account created",
+        description: "Welcome to Elite Hub!",
+      });
+      if (user.role === "restaurant_owner") {
+        setLocation("/onboarding");
+      } else {
+        setLocation("/");
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Registration failed",
+        description: error.message || "Could not create account",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      {/* Background elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-primary/5 to-transparent" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -72,60 +116,178 @@ export default function Auth() {
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8 bg-background/50 border border-white/5">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="login" data-testid="tab-login">Login</TabsTrigger>
+              <TabsTrigger value="signup" data-testid="tab-signup">Sign Up</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
                   <FormField
-                    control={form.control}
+                    control={loginForm.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-white/80">Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="name@example.com" {...field} className="bg-background/50 border-white/10 focus:border-primary/50" />
+                          <Input 
+                            placeholder="name@example.com" 
+                            {...field} 
+                            className="bg-background/50 border-white/10 focus:border-primary/50"
+                            data-testid="input-login-email"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={loginForm.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-white/80">Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} className="bg-background/50 border-white/10 focus:border-primary/50" />
+                          <Input 
+                            type="password" 
+                            placeholder="••••••••" 
+                            {...field} 
+                            className="bg-background/50 border-white/10 focus:border-primary/50"
+                            data-testid="input-login-password"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 mt-4" disabled={isLoading}>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 mt-4" 
+                    disabled={isLoading}
+                    data-testid="button-login"
+                  >
                     {isLoading ? "Authenticating..." : "Sign In"}
                   </Button>
                 </form>
               </Form>
               
               <div className="mt-6 text-center text-sm text-muted-foreground">
-                <p>Demo Accounts:</p>
+                <p>Demo Accounts (password: password123):</p>
                 <div className="flex justify-center gap-4 mt-2 text-xs">
-                  <button onClick={() => form.setValue("email", "admin@elite.com")} className="hover:text-primary underline">Admin</button>
-                  <button onClick={() => form.setValue("email", "rest@elite.com")} className="hover:text-primary underline">Restaurant</button>
-                  <button onClick={() => form.setValue("email", "user@elite.com")} className="hover:text-primary underline">User</button>
+                  <button 
+                    onClick={() => { loginForm.setValue("email", "admin@elite.com"); loginForm.setValue("password", "password123"); }} 
+                    className="hover:text-primary underline"
+                    data-testid="button-demo-admin"
+                  >
+                    Admin
+                  </button>
+                  <button 
+                    onClick={() => { loginForm.setValue("email", "owner@elite.com"); loginForm.setValue("password", "password123"); }} 
+                    className="hover:text-primary underline"
+                    data-testid="button-demo-owner"
+                  >
+                    Restaurant
+                  </button>
+                  <button 
+                    onClick={() => { loginForm.setValue("email", "user@elite.com"); loginForm.setValue("password", "password123"); }} 
+                    className="hover:text-primary underline"
+                    data-testid="button-demo-user"
+                  >
+                    User
+                  </button>
                 </div>
               </div>
             </TabsContent>
             
             <TabsContent value="signup">
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Registration is currently invitation only.</p>
-                <Button variant="link" className="text-primary mt-2">Request an invite</Button>
-              </div>
+              <Form {...registerForm}>
+                <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
+                  <FormField
+                    control={registerForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white/80">Full Name</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="John Doe" 
+                            {...field} 
+                            className="bg-background/50 border-white/10 focus:border-primary/50"
+                            data-testid="input-register-name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white/80">Email</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="name@example.com" 
+                            {...field} 
+                            className="bg-background/50 border-white/10 focus:border-primary/50"
+                            data-testid="input-register-email"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white/80">Password</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password" 
+                            placeholder="••••••••" 
+                            {...field} 
+                            className="bg-background/50 border-white/10 focus:border-primary/50"
+                            data-testid="input-register-password"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white/80">Account Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background/50 border-white/10" data-testid="select-role">
+                              <SelectValue placeholder="Select account type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="customer">Diner</SelectItem>
+                            <SelectItem value="restaurant_owner">Restaurant Owner</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90 mt-4" 
+                    disabled={isLoading}
+                    data-testid="button-register"
+                  >
+                    {isLoading ? "Creating account..." : "Create Account"}
+                  </Button>
+                </form>
+              </Form>
             </TabsContent>
           </Tabs>
         </CardContent>
