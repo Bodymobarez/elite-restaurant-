@@ -55,8 +55,8 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group cursor-pointer">
-            <img src={logo} alt="Elite Hub" className="w-10 h-10 rounded-full border border-primary/20 group-hover:border-primary/60 transition-colors" />
-            <span className="font-heading text-2xl font-medium tracking-tight text-white">Elite<span className="text-primary">Hub</span></span>
+            <img src={logo} alt="Elite Restaurants" className="w-10 h-10 rounded-full border border-primary/20 group-hover:border-primary/60 transition-colors" />
+            <span className="font-heading text-2xl font-medium tracking-tight text-white">Elite <span className="text-primary">Restaurants</span></span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -120,8 +120,8 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="space-y-4">
              <div className="flex items-center gap-2">
-              <img src={logo} alt="Elite Hub" className="w-8 h-8 rounded-full" />
-              <span className="font-heading text-xl text-white">Elite<span className="text-primary">Hub</span></span>
+              <img src={logo} alt="Elite Restaurants" className="w-8 h-8 rounded-full" />
+              <span className="font-heading text-xl text-white">Elite <span className="text-primary">Restaurants</span></span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               {t('footer.tagline')}
