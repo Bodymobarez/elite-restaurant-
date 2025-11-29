@@ -49,7 +49,7 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
         className={cn(
           "fixed top-0 w-full z-50 transition-all duration-300 border-b border-transparent px-6 py-4",
           (isScrolled || !isHome) 
-            ? "bg-background/80 backdrop-blur-md border-white/10 py-3" 
+            ? "bg-background/80 backdrop-blur-xl border-white/5 py-3 shadow-lg shadow-primary/5" 
             : "bg-transparent py-6"
         )}
       >

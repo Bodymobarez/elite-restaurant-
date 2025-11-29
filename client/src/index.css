@@ -114,4 +114,19 @@
   .text-gold {
     @apply text-[#D4AF37];
   }
+  .luxury-shadow {
+    @apply shadow-2xl shadow-primary/5;
+  }
+  .luxury-glow {
+    @apply shadow-[0_0_30px_rgba(212,175,55,0.15)];
+  }
+  .elegant-border {
+    @apply border border-white/10 hover:border-primary/30 transition-colors;
+  }
+  .card-gradient {
+    @apply bg-gradient-to-br from-white/5 to-transparent;
+  }
+  .luxury-text {
+    @apply text-white/95 leading-relaxed;
+  }
 }
