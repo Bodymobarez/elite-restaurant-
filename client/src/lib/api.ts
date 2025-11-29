@@ -154,7 +154,9 @@ export function useAdminStats() {
     restaurants: number;
     users: number;
     orders: number;
+    reservations: number;
     pendingApprovals: number;
+    pendingReservations: number;
   }>({
     queryKey: ["/api/admin/stats"],
     queryFn: async () => {
