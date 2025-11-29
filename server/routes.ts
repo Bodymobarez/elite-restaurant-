@@ -808,7 +808,97 @@ export async function registerRoutes(
       await storage.createMenuItem({ restaurantId: la.id, name: "Burrata Caprese", description: "Fresh burrata with heirloom tomatoes and basil", price: "280", category: "Starters", image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80", available: true });
       await storage.createMenuItem({ restaurantId: la.id, name: "Panna Cotta", description: "Vanilla panna cotta with berry compote", price: "180", category: "Desserts", image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80", available: true });
 
-      res.json({ success: true, message: "Egyptian seed data created successfully" });
+      // Create sample reservations
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+      
+      // Sequoia reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: sequoia.id, date: tomorrow, time: "19:00", partySize: 4, status: "confirmed", specialRequests: "Window table preferred" });
+      await storage.createReservation({ userId: customer.id, restaurantId: sequoia.id, date: tomorrow, time: "20:30", partySize: 2, status: "pending" });
+      
+      // Kazoku reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: kazoku.id, date: today, time: "19:30", partySize: 3, status: "completed" });
+      await storage.createReservation({ userId: customer.id, restaurantId: kazoku.id, date: tomorrow, time: "20:00", partySize: 6, status: "confirmed" });
+      
+      // The Steakhouse reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: steakHouse.id, date: tomorrow, time: "19:00", partySize: 4, status: "confirmed", specialRequests: "Celebration dinner" });
+      
+      // La Capitale reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: laCapitale.id, date: today, time: "20:00", partySize: 2, status: "completed" });
+      
+      // Nubia Lounge reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: nubia.id, date: tomorrow, time: "18:30", partySize: 5, status: "confirmed" });
+      
+      // Maison Thomas reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: maison.id, date: tomorrow, time: "19:00", partySize: 2, status: "pending" });
+      
+      // Pier 88 reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: pier88.id, date: tomorrow, time: "20:00", partySize: 4, status: "confirmed", specialRequests: "Birthday party" });
+      
+      // Balbaa Village reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: balbaa.id, date: today, time: "19:00", partySize: 3, status: "completed" });
+      
+      // Fish Market reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: fishMarket.id, date: tomorrow, time: "18:00", partySize: 2, status: "confirmed" });
+      
+      // Moby Dick reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: moby.id, date: tomorrow, time: "19:00", partySize: 4, status: "pending" });
+      
+      // La Luna reservations
+      await storage.createReservation({ userId: customer.id, restaurantId: la.id, date: today, time: "20:30", partySize: 2, status: "completed" });
+      await storage.createReservation({ userId: customer.id, restaurantId: la.id, date: tomorrow, time: "19:30", partySize: 6, status: "confirmed", specialRequests: "Romantic dinner" });
+
+      // Create sample orders with order items
+      const seqMenuItems = await storage.getMenuItems(sequoia.id);
+      const kazMenuItems = await storage.getMenuItems(kazoku.id);
+      const stMenuItems = await storage.getMenuItems(steakHouse.id);
+      const maisonMenuItems = await storage.getMenuItems(maison.id);
+
+      // Sequoia order
+      const order1 = await storage.createOrder({ userId: customer.id, restaurantId: sequoia.id, status: "served", total: "2100", customerName: "Ahmed Al-Mansouri" });
+      if (seqMenuItems.length > 0) {
+        await storage.createOrderItem({ orderId: order1.id, menuItemId: seqMenuItems[0].id, quantity: 2, price: seqMenuItems[0].price });
+        if (seqMenuItems.length > 1) {
+          await storage.createOrderItem({ orderId: order1.id, menuItemId: seqMenuItems[1].id, quantity: 1, price: seqMenuItems[1].price });
+        }
+      }
+
+      // Kazoku order
+      const order2 = await storage.createOrder({ userId: customer.id, restaurantId: kazoku.id, status: "ready", total: "2850", customerName: "Fatima Hassan" });
+      if (kazMenuItems.length > 0) {
+        await storage.createOrderItem({ orderId: order2.id, menuItemId: kazMenuItems[0].id, quantity: 1, price: kazMenuItems[0].price });
+        if (kazMenuItems.length > 1) {
+          await storage.createOrderItem({ orderId: order2.id, menuItemId: kazMenuItems[1].id, quantity: 1, price: kazMenuItems[1].price });
+        }
+      }
+
+      // The Steakhouse order
+      const order3 = await storage.createOrder({ userId: customer.id, restaurantId: steakHouse.id, status: "preparing", total: "3500", customerName: "Mohamed Karim" });
+      if (stMenuItems.length > 0) {
+        await storage.createOrderItem({ orderId: order3.id, menuItemId: stMenuItems[0].id, quantity: 2, price: stMenuItems[0].price });
+        if (stMenuItems.length > 1) {
+          await storage.createOrderItem({ orderId: order3.id, menuItemId: stMenuItems[1].id, quantity: 1, price: stMenuItems[1].price });
+        }
+      }
+
+      // Maison Thomas order
+      const order4 = await storage.createOrder({ userId: customer.id, restaurantId: maison.id, status: "pending", total: "630", customerName: "Sara Ahmad" });
+      if (maisonMenuItems.length > 0) {
+        await storage.createOrderItem({ orderId: order4.id, menuItemId: maisonMenuItems[0].id, quantity: 2, price: maisonMenuItems[0].price });
+        if (maisonMenuItems.length > 1) {
+          await storage.createOrderItem({ orderId: order4.id, menuItemId: maisonMenuItems[1].id, quantity: 1, price: maisonMenuItems[1].price });
+        }
+      }
+
+      // Create favorites
+      await storage.addFavorite({ userId: customer.id, restaurantId: sequoia.id });
+      await storage.addFavorite({ userId: customer.id, restaurantId: kazoku.id });
+      await storage.addFavorite({ userId: customer.id, restaurantId: steakHouse.id });
+      await storage.addFavorite({ userId: customer.id, restaurantId: laCapitale.id });
+      await storage.addFavorite({ userId: customer.id, restaurantId: pier88.id });
+      await storage.addFavorite({ userId: customer.id, restaurantId: la.id });
+
+      res.json({ success: true, message: "Egyptian seed data created successfully with all mock data" });
     } catch (error) {
       console.error("Seed error:", error);
       res.status(500).json({ error: "Failed to seed data" });
