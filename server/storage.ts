@@ -1,17 +1,28 @@
 import { 
   users, restaurants, menuItems, reservations, orders, orderItems, favorites,
+  governorates, districts,
   type User, type InsertUser,
   type Restaurant, type InsertRestaurant,
   type MenuItem, type InsertMenuItem,
   type Reservation, type InsertReservation,
   type Order, type InsertOrder,
   type OrderItem, type InsertOrderItem,
-  type Favorite, type InsertFavorite
+  type Favorite, type InsertFavorite,
+  type Governorate, type InsertGovernorate,
+  type District, type InsertDistrict
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
 
 export interface IStorage {
+  // Governorates & Districts
+  getGovernorates(): Promise<Governorate[]>;
+  getGovernorate(id: string): Promise<Governorate | undefined>;
+  createGovernorate(gov: InsertGovernorate): Promise<Governorate>;
+  getDistricts(governorateId?: string): Promise<District[]>;
+  getDistrict(id: string): Promise<District | undefined>;
+  createDistrict(district: InsertDistrict): Promise<District>;
+
   // Users
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
@@ -21,7 +32,7 @@ export interface IStorage {
   deleteUser(id: string): Promise<boolean>;
 
   // Restaurants
-  getRestaurants(): Promise<Restaurant[]>;
+  getRestaurants(governorateId?: string, districtId?: string): Promise<Restaurant[]>;
   getRestaurant(id: string): Promise<Restaurant | undefined>;
   getRestaurantsByOwner(ownerId: string): Promise<Restaurant[]>;
   createRestaurant(restaurant: InsertRestaurant): Promise<Restaurant>;
@@ -59,6 +70,38 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Governorates & Districts
+  async getGovernorates(): Promise<Governorate[]> {
+    return db.select().from(governorates).orderBy(governorates.name);
+  }
+
+  async getGovernorate(id: string): Promise<Governorate | undefined> {
+    const [gov] = await db.select().from(governorates).where(eq(governorates.id, id));
+    return gov || undefined;
+  }
+
+  async createGovernorate(gov: InsertGovernorate): Promise<Governorate> {
+    const [created] = await db.insert(governorates).values(gov).returning();
+    return created;
+  }
+
+  async getDistricts(governorateId?: string): Promise<District[]> {
+    if (governorateId) {
+      return db.select().from(districts).where(eq(districts.governorateId, governorateId)).orderBy(districts.name);
+    }
+    return db.select().from(districts).orderBy(districts.name);
+  }
+
+  async getDistrict(id: string): Promise<District | undefined> {
+    const [district] = await db.select().from(districts).where(eq(districts.id, id));
+    return district || undefined;
+  }
+
+  async createDistrict(district: InsertDistrict): Promise<District> {
+    const [created] = await db.insert(districts).values(district).returning();
+    return created;
+  }
+
   // Users
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -90,8 +133,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Restaurants
-  async getRestaurants(): Promise<Restaurant[]> {
-    return db.select().from(restaurants).where(eq(restaurants.status, "active")).orderBy(desc(restaurants.createdAt));
+  async getRestaurants(governorateId?: string, districtId?: string): Promise<Restaurant[]> {
+    if (districtId) {
+      return db.select().from(restaurants)
+        .where(and(eq(restaurants.status, "active"), eq(restaurants.districtId, districtId)))
+        .orderBy(desc(restaurants.rating));
+    }
+    if (governorateId) {
+      return db.select().from(restaurants)
+        .where(and(eq(restaurants.status, "active"), eq(restaurants.governorateId, governorateId)))
+        .orderBy(desc(restaurants.rating));
+    }
+    return db.select().from(restaurants).where(eq(restaurants.status, "active")).orderBy(desc(restaurants.rating));
   }
 
   async getRestaurant(id: string): Promise<Restaurant | undefined> {

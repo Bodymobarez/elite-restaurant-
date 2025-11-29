@@ -84,10 +84,41 @@ export async function registerRoutes(
     res.json(userWithoutPassword);
   });
 
+  // ========== LOCATION ROUTES ==========
+  app.get("/api/governorates", async (req, res) => {
+    try {
+      const govs = await storage.getGovernorates();
+      res.json(govs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch governorates" });
+    }
+  });
+
+  app.get("/api/governorates/:id/districts", async (req, res) => {
+    try {
+      const dists = await storage.getDistricts(req.params.id);
+      res.json(dists);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch districts" });
+    }
+  });
+
+  app.get("/api/districts", async (req, res) => {
+    try {
+      const governorateId = req.query.governorateId as string | undefined;
+      const dists = await storage.getDistricts(governorateId);
+      res.json(dists);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch districts" });
+    }
+  });
+
   // ========== RESTAURANT ROUTES ==========
   app.get("/api/restaurants", async (req, res) => {
     try {
-      const restaurants = await storage.getRestaurants();
+      const governorateId = req.query.governorateId as string | undefined;
+      const districtId = req.query.districtId as string | undefined;
+      const restaurants = await storage.getRestaurants(governorateId, districtId);
       res.json(restaurants);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch restaurants" });
@@ -457,11 +488,44 @@ export async function registerRoutes(
     try {
       const hashedPassword = await hash("password123", 10);
       
+      // Create Egyptian Governorates
+      const cairo = await storage.createGovernorate({ name: "Cairo", nameAr: "القاهرة" });
+      const giza = await storage.createGovernorate({ name: "Giza", nameAr: "الجيزة" });
+      const alexandria = await storage.createGovernorate({ name: "Alexandria", nameAr: "الإسكندرية" });
+      const redSea = await storage.createGovernorate({ name: "Red Sea", nameAr: "البحر الأحمر" });
+      const southSinai = await storage.createGovernorate({ name: "South Sinai", nameAr: "جنوب سيناء" });
+
+      // Cairo Districts
+      const zamalek = await storage.createDistrict({ governorateId: cairo.id, name: "Zamalek", nameAr: "الزمالك" });
+      const maadi = await storage.createDistrict({ governorateId: cairo.id, name: "Maadi", nameAr: "المعادي" });
+      const heliopolis = await storage.createDistrict({ governorateId: cairo.id, name: "Heliopolis", nameAr: "مصر الجديدة" });
+      const newCairo = await storage.createDistrict({ governorateId: cairo.id, name: "New Cairo", nameAr: "القاهرة الجديدة" });
+      const gardenCity = await storage.createDistrict({ governorateId: cairo.id, name: "Garden City", nameAr: "جاردن سيتي" });
+      const downtown = await storage.createDistrict({ governorateId: cairo.id, name: "Downtown", nameAr: "وسط البلد" });
+
+      // Giza Districts
+      const sheikh = await storage.createDistrict({ governorateId: giza.id, name: "Sheikh Zayed", nameAr: "الشيخ زايد" });
+      const october = await storage.createDistrict({ governorateId: giza.id, name: "6th of October", nameAr: "السادس من أكتوبر" });
+      const dokki = await storage.createDistrict({ governorateId: giza.id, name: "Dokki", nameAr: "الدقي" });
+      const mohandessin = await storage.createDistrict({ governorateId: giza.id, name: "Mohandessin", nameAr: "المهندسين" });
+
+      // Alexandria Districts
+      const sanStefano = await storage.createDistrict({ governorateId: alexandria.id, name: "San Stefano", nameAr: "سان ستيفانو" });
+      const stanley = await storage.createDistrict({ governorateId: alexandria.id, name: "Stanley", nameAr: "ستانلي" });
+      const gleem = await storage.createDistrict({ governorateId: alexandria.id, name: "Gleem", nameAr: "جليم" });
+
+      // Red Sea Districts
+      const hurghada = await storage.createDistrict({ governorateId: redSea.id, name: "Hurghada", nameAr: "الغردقة" });
+      const elGouna = await storage.createDistrict({ governorateId: redSea.id, name: "El Gouna", nameAr: "الجونة" });
+
+      // South Sinai Districts
+      const sharmElSheikh = await storage.createDistrict({ governorateId: southSinai.id, name: "Sharm El Sheikh", nameAr: "شرم الشيخ" });
+
       // Create admin user
       const admin = await storage.createUser({
         email: "admin@elite.com",
         password: hashedPassword,
-        name: "Admin User",
+        name: "مدير النظام",
         role: "admin"
       });
 
@@ -469,7 +533,7 @@ export async function registerRoutes(
       const owner = await storage.createUser({
         email: "owner@elite.com", 
         password: hashedPassword,
-        name: "Restaurant Owner",
+        name: "صاحب المطعم",
         role: "restaurant_owner"
       });
 
@@ -477,79 +541,298 @@ export async function registerRoutes(
       const customer = await storage.createUser({
         email: "user@elite.com",
         password: hashedPassword,
-        name: "Jordan Davis",
+        name: "أحمد محمد",
         role: "customer"
       });
 
-      // Create restaurants
-      const lumiere = await storage.createRestaurant({
+      // Famous Elite Restaurants in Egypt - Cairo
+      const sequoia = await storage.createRestaurant({
         ownerId: owner.id,
-        name: "Lumière",
-        cuisine: "French Fine Dining",
-        description: "An intimate French dining experience with exquisite tasting menus",
+        name: "Sequoia",
+        cuisine: "Mediterranean & Oriental",
+        description: "مطعم فاخر على ضفاف النيل بإطلالة ساحرة - One of Cairo's most iconic restaurants on the Nile",
         image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        address: "123 Downtown Avenue, Metropolis",
-        phone: "+1 (555) 123-4567",
+        address: "53 Abu El Feda St, Zamalek",
+        governorateId: cairo.id,
+        districtId: zamalek.id,
+        phone: "+20 2 2735 0014",
         priceRange: "$$$$",
         status: "active"
       });
 
-      const sakura = await storage.createRestaurant({
+      const kazoku = await storage.createRestaurant({
         ownerId: owner.id,
-        name: "Sakura Zen",
-        cuisine: "Modern Japanese",
-        description: "Contemporary Japanese cuisine with traditional roots",
+        name: "Kazoku",
+        cuisine: "Japanese Fine Dining",
+        description: "مطبخ ياباني راقي مع أطباق السوشي والتيبانياكي - Premium Japanese cuisine with sushi and teppanyaki",
         image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
-        address: "456 Arts District, Metropolis",
-        phone: "+1 (555) 234-5678",
+        address: "Four Seasons Nile Plaza, Garden City",
+        governorateId: cairo.id,
+        districtId: gardenCity.id,
+        phone: "+20 2 2791 7000",
+        priceRange: "$$$$",
+        status: "active"
+      });
+
+      const steakHouse = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "The Steakhouse",
+        cuisine: "American Steakhouse",
+        description: "أفضل شرائح اللحم في القاهرة - Premium dry-aged steaks in an elegant setting",
+        image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        address: "JW Marriott, Mirage City, New Cairo",
+        governorateId: cairo.id,
+        districtId: newCairo.id,
+        phone: "+20 2 2411 5588",
+        priceRange: "$$$$",
+        status: "active"
+      });
+
+      const nubia = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "Nubia Lounge",
+        cuisine: "Egyptian & Nubian",
+        description: "تجربة مصرية أصيلة مع المأكولات النوبية - Authentic Egyptian and Nubian cuisine experience",
+        image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
+        address: "Corniche El Nil, Maadi",
+        governorateId: cairo.id,
+        districtId: maadi.id,
+        phone: "+20 2 2526 0000",
         priceRange: "$$$",
         status: "active"
       });
 
-      const obsidian = await storage.createRestaurant({
+      const laCapitale = await storage.createRestaurant({
         ownerId: owner.id,
-        name: "The Obsidian Steakhouse",
-        cuisine: "Steakhouse",
-        description: "Premium cuts in an elegant dark atmosphere",
-        image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
-        address: "789 Financial District, Metropolis",
-        phone: "+1 (555) 345-6789",
+        name: "La Capitale",
+        cuisine: "French Fine Dining",
+        description: "المطبخ الفرنسي الراقي في قلب القاهرة - Exquisite French cuisine in the heart of Cairo",
+        image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        address: "Sofitel Cairo Nile El Gezirah, Zamalek",
+        governorateId: cairo.id,
+        districtId: zamalek.id,
+        phone: "+20 2 2737 3737",
+        priceRange: "$$$$",
+        status: "active"
+      });
+
+      // Sheikh Zayed Restaurants
+      const maison = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "Maison Thomas",
+        cuisine: "Italian & Mediterranean",
+        description: "البيتزا والباستا الإيطالية الأصيلة - Authentic Italian pizza and pasta since 1922",
+        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1481&q=80",
+        address: "Arkan Mall, Sheikh Zayed",
+        governorateId: giza.id,
+        districtId: sheikh.id,
+        phone: "+20 2 3851 0000",
+        priceRange: "$$$",
+        status: "active"
+      });
+
+      const pier88 = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "Pier 88",
+        cuisine: "Seafood",
+        description: "أجود المأكولات البحرية الطازجة - Fresh premium seafood with Mediterranean flair",
+        image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
+        address: "CityScape Mall, 6th of October",
+        governorateId: giza.id,
+        districtId: october.id,
+        phone: "+20 2 3827 0088",
+        priceRange: "$$$$",
+        status: "active"
+      });
+
+      // Alexandria Restaurants
+      const balbaa = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "Balbaa Village",
+        cuisine: "Seafood & Grills",
+        description: "المأكولات البحرية الطازجة من البحر مباشرة - Fresh seafood straight from the Mediterranean",
+        image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
+        address: "San Stefano Grand Plaza, Alexandria",
+        governorateId: alexandria.id,
+        districtId: sanStefano.id,
+        phone: "+20 3 469 0000",
+        priceRange: "$$$",
+        status: "active"
+      });
+
+      const fishMarket = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "Fish Market",
+        cuisine: "Seafood",
+        description: "اختر سمكتك وسنطهيها لك - Pick your fish and we'll cook it your way",
+        image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
+        address: "Corniche, Stanley, Alexandria",
+        governorateId: alexandria.id,
+        districtId: stanley.id,
+        phone: "+20 3 545 0000",
+        priceRange: "$$$",
+        status: "active"
+      });
+
+      // Red Sea Restaurants
+      const moby = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "Moby Dick",
+        cuisine: "Seafood & International",
+        description: "مطعم بحري فاخر على البحر الأحمر - Premium seafood restaurant on the Red Sea",
+        image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1074&q=80",
+        address: "El Gouna Marina",
+        governorateId: redSea.id,
+        districtId: elGouna.id,
+        phone: "+20 65 358 0000",
+        priceRange: "$$$$",
+        status: "active"
+      });
+
+      // Sharm El Sheikh
+      const la = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "La Luna",
+        cuisine: "Italian Fine Dining",
+        description: "المطبخ الإيطالي الراقي مع إطلالة على البحر - Fine Italian dining with sea views",
+        image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        address: "Naama Bay, Sharm El Sheikh",
+        governorateId: southSinai.id,
+        districtId: sharmElSheikh.id,
+        phone: "+20 69 360 0000",
+        priceRange: "$$$$",
+        status: "active"
+      });
+
+      // Pending restaurant
+      const pending = await storage.createRestaurant({
+        ownerId: owner.id,
+        name: "Kempinski Nile",
+        cuisine: "International",
+        description: "مطعم فندقي فاخر قيد المراجعة - Luxury hotel restaurant pending approval",
+        image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        address: "Kempinski Nile Hotel, Garden City",
+        governorateId: cairo.id,
+        districtId: gardenCity.id,
+        phone: "+20 2 2798 0000",
         priceRange: "$$$$",
         status: "pending"
       });
 
-      // Create menu items for Lumière
+      // Create menu items for Sequoia (EGP prices)
       await storage.createMenuItem({
-        restaurantId: lumiere.id,
-        name: "Truffle Risotto",
-        description: "Arborio rice with black truffle and aged parmesan",
-        price: "45",
-        category: "Mains",
-        image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        restaurantId: sequoia.id,
+        name: "Mixed Grills Platter",
+        description: "طبق مشويات مشكلة فاخر - Premium mixed grill selection",
+        price: "850",
+        category: "Main Courses",
+        image: "https://images.unsplash.com/photo-1544025162-d76978cde07a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         available: true
       });
 
       await storage.createMenuItem({
-        restaurantId: lumiere.id,
-        name: "Wagyu Beef Tartare",
-        description: "Hand-cut A5 wagyu with quail egg and capers",
-        price: "38",
-        category: "Starters",
+        restaurantId: sequoia.id,
+        name: "Hummus Beiruti",
+        description: "حمص على الطريقة اللبنانية - Traditional Lebanese hummus",
+        price: "180",
+        category: "Appetizers",
+        image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        available: true
+      });
+
+      await storage.createMenuItem({
+        restaurantId: sequoia.id,
+        name: "Grilled Sea Bass",
+        description: "قاروص مشوي مع الأعشاب - Grilled sea bass with herbs",
+        price: "650",
+        category: "Seafood",
         image: "https://images.unsplash.com/photo-1519708227418-c8fd9a3a27cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         available: true
       });
 
       await storage.createMenuItem({
-        restaurantId: lumiere.id,
-        name: "Gold Leaf Chocolate Dome",
-        description: "Valrhona chocolate with raspberry coulis",
-        price: "32",
+        restaurantId: sequoia.id,
+        name: "Kunafa",
+        description: "كنافة بالقشطة والفستق - Traditional kunafa with cream and pistachios",
+        price: "220",
         category: "Desserts",
         image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80",
         available: true
       });
 
-      res.json({ success: true, message: "Seed data created successfully" });
+      // Create menu items for Kazoku (Japanese - EGP prices)
+      await storage.createMenuItem({
+        restaurantId: kazoku.id,
+        name: "Omakase Sushi",
+        description: "تشكيلة سوشي من اختيار الشيف - Chef's selection sushi platter",
+        price: "1200",
+        category: "Sushi",
+        image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        available: true
+      });
+
+      await storage.createMenuItem({
+        restaurantId: kazoku.id,
+        name: "Wagyu Teppanyaki",
+        description: "لحم واغيو على الصاج الياباني - Premium Wagyu beef on hot plate",
+        price: "1800",
+        category: "Teppanyaki",
+        image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        available: true
+      });
+
+      await storage.createMenuItem({
+        restaurantId: kazoku.id,
+        name: "Dragon Roll",
+        description: "رول التنين مع الأفوكادو وسمك الأنقليس - Dragon roll with avocado and eel",
+        price: "450",
+        category: "Sushi",
+        image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        available: true
+      });
+
+      await storage.createMenuItem({
+        restaurantId: kazoku.id,
+        name: "Mochi Ice Cream",
+        description: "آيس كريم موتشي ياباني - Japanese mochi ice cream",
+        price: "180",
+        category: "Desserts",
+        image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1364&q=80",
+        available: true
+      });
+
+      // Create menu items for The Steakhouse (EGP prices)
+      await storage.createMenuItem({
+        restaurantId: steakHouse.id,
+        name: "Ribeye Steak 400g",
+        description: "ريب آي ستيك معتق - Dry-aged ribeye steak",
+        price: "1400",
+        category: "Steaks",
+        image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        available: true
+      });
+
+      await storage.createMenuItem({
+        restaurantId: steakHouse.id,
+        name: "Filet Mignon 300g",
+        description: "فيليه مينيون طري - Tender filet mignon",
+        price: "1600",
+        category: "Steaks",
+        image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        available: true
+      });
+
+      await storage.createMenuItem({
+        restaurantId: steakHouse.id,
+        name: "Caesar Salad",
+        description: "سلطة سيزر الكلاسيكية - Classic Caesar salad",
+        price: "220",
+        category: "Starters",
+        image: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
+        available: true
+      });
+
+      res.json({ success: true, message: "تم إنشاء البيانات بنجاح - Egyptian seed data created successfully" });
     } catch (error) {
       console.error("Seed error:", error);
       res.status(500).json({ error: "Failed to seed data" });

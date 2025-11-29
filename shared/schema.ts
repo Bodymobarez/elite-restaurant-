@@ -8,6 +8,23 @@ export const reservationStatusEnum = pgEnum("reservation_status", ["pending", "c
 export const orderStatusEnum = pgEnum("order_status", ["pending", "preparing", "ready", "served", "cancelled"]);
 export const restaurantStatusEnum = pgEnum("restaurant_status", ["pending", "active", "suspended"]);
 
+// Egyptian Governorates
+export const governorates = pgTable("governorates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  nameAr: text("name_ar").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Districts within Governorates
+export const districts = pgTable("districts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  governorateId: varchar("governorate_id").references(() => governorates.id).notNull(),
+  name: text("name").notNull(),
+  nameAr: text("name_ar").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: text("email").notNull().unique(),
@@ -27,13 +44,15 @@ export const restaurants = pgTable("restaurants", {
   description: text("description"),
   image: text("image"),
   address: text("address").notNull(),
+  governorateId: varchar("governorate_id").references(() => governorates.id),
+  districtId: varchar("district_id").references(() => districts.id),
   phone: text("phone"),
   email: text("email"),
-  priceRange: text("price_range").notNull().default("$$"),
-  rating: decimal("rating", { precision: 2, scale: 1 }).default("0"),
+  priceRange: text("price_range").notNull().default("$$$$"),
+  rating: decimal("rating", { precision: 2, scale: 1 }).default("4.5"),
   status: restaurantStatusEnum("status").notNull().default("pending"),
-  openTime: text("open_time").default("17:00"),
-  closeTime: text("close_time").default("23:00"),
+  openTime: text("open_time").default("12:00"),
+  closeTime: text("close_time").default("00:00"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -89,6 +108,8 @@ export const favorites = pgTable("favorites", {
 });
 
 // Insert schemas
+export const insertGovernorateSchema = createInsertSchema(governorates).omit({ id: true, createdAt: true });
+export const insertDistrictSchema = createInsertSchema(districts).omit({ id: true, createdAt: true });
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertRestaurantSchema = createInsertSchema(restaurants).omit({ id: true, createdAt: true, rating: true });
 export const insertMenuItemSchema = createInsertSchema(menuItems).omit({ id: true, createdAt: true });
@@ -98,6 +119,10 @@ export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: t
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({ id: true, createdAt: true });
 
 // Types
+export type InsertGovernorate = z.infer<typeof insertGovernorateSchema>;
+export type Governorate = typeof governorates.$inferSelect;
+export type InsertDistrict = z.infer<typeof insertDistrictSchema>;
+export type District = typeof districts.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertRestaurant = z.infer<typeof insertRestaurantSchema>;
