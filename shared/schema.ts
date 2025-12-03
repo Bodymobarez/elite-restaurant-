@@ -7,6 +7,8 @@ export const userRoleEnum = pgEnum("user_role", ["customer", "restaurant_owner",
 export const reservationStatusEnum = pgEnum("reservation_status", ["pending", "confirmed", "cancelled", "completed"]);
 export const orderStatusEnum = pgEnum("order_status", ["pending", "preparing", "ready", "served", "cancelled"]);
 export const restaurantStatusEnum = pgEnum("restaurant_status", ["pending", "active", "suspended"]);
+export const activityTypeEnum = pgEnum("activity_type", ["user_registered", "user_updated", "user_deleted", "restaurant_created", "restaurant_approved", "restaurant_suspended", "reservation_created", "reservation_updated", "order_created", "order_updated", "system_setting_changed"]);
+export const notificationTypeEnum = pgEnum("notification_type", ["info", "success", "warning", "error"]);
 
 // Egyptian Governorates
 export const governorates = pgTable("governorates", {
@@ -107,6 +109,36 @@ export const favorites = pgTable("favorites", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const reviews = pgTable("reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  restaurantId: varchar("restaurant_id").references(() => restaurants.id).notNull(),
+  rating: integer("rating").notNull(),
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const activityLogs = pgTable("activity_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  activityType: activityTypeEnum("activity_type").notNull(),
+  description: text("description").notNull(),
+  metadata: text("metadata"),
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  type: notificationTypeEnum("type").notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  read: boolean("read").notNull().default(false),
+  link: text("link"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertGovernorateSchema = createInsertSchema(governorates).omit({ id: true, createdAt: true });
 export const insertDistrictSchema = createInsertSchema(districts).omit({ id: true, createdAt: true });
@@ -117,6 +149,9 @@ export const insertReservationSchema = createInsertSchema(reservations).omit({ i
 export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true });
 export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true });
 export const insertFavoriteSchema = createInsertSchema(favorites).omit({ id: true, createdAt: true });
+export const insertReviewSchema = createInsertSchema(reviews).omit({ id: true, createdAt: true });
+export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({ id: true, createdAt: true });
+export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
 
 // Types
 export type InsertGovernorate = z.infer<typeof insertGovernorateSchema>;
@@ -137,6 +172,12 @@ export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
 export type Favorite = typeof favorites.$inferSelect;
+export type InsertReview = z.infer<typeof insertReviewSchema>;
+export type Review = typeof reviews.$inferSelect;
+export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Notification = typeof notifications.$inferSelect;
 
 // Login schema
 export const loginSchema = z.object({

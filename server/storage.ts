@@ -1,6 +1,6 @@
 import { 
   users, restaurants, menuItems, reservations, orders, orderItems, favorites,
-  governorates, districts,
+  governorates, districts, reviews, activityLogs, notifications,
   type User, type InsertUser,
   type Restaurant, type InsertRestaurant,
   type MenuItem, type InsertMenuItem,
@@ -9,7 +9,10 @@ import {
   type OrderItem, type InsertOrderItem,
   type Favorite, type InsertFavorite,
   type Governorate, type InsertGovernorate,
-  type District, type InsertDistrict
+  type District, type InsertDistrict,
+  type Review, type InsertReview,
+  type ActivityLog, type InsertActivityLog,
+  type Notification, type InsertNotification
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
@@ -67,6 +70,21 @@ export interface IStorage {
   addFavorite(favorite: InsertFavorite): Promise<Favorite>;
   removeFavorite(userId: string, restaurantId: string): Promise<boolean>;
   isFavorite(userId: string, restaurantId: string): Promise<boolean>;
+
+  // Reviews
+  getReviews(restaurantId: string): Promise<Review[]>;
+  createReview(review: InsertReview): Promise<Review>;
+  deleteReview(id: string): Promise<boolean>;
+
+  // Activity Logs
+  getActivityLogs(limit?: number): Promise<ActivityLog[]>;
+  createActivityLog(log: InsertActivityLog): Promise<ActivityLog>;
+
+  // Notifications
+  getNotifications(userId?: string): Promise<Notification[]>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationRead(id: string): Promise<boolean>;
+  deleteNotification(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -278,6 +296,58 @@ export class DatabaseStorage implements IStorage {
       and(eq(favorites.userId, userId), eq(favorites.restaurantId, restaurantId))
     );
     return !!fav;
+  }
+
+  // Reviews
+  async getReviews(restaurantId: string): Promise<Review[]> {
+    return db.select().from(reviews).where(eq(reviews.restaurantId, restaurantId)).orderBy(desc(reviews.createdAt));
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    const [created] = await db.insert(reviews).values(review).returning();
+    return created;
+  }
+
+  async deleteReview(id: string): Promise<boolean> {
+    await db.delete(reviews).where(eq(reviews.id, id));
+    return true;
+  }
+
+  // Activity Logs
+  async getActivityLogs(limit?: number): Promise<ActivityLog[]> {
+    const query = db.select().from(activityLogs).orderBy(desc(activityLogs.createdAt));
+    if (limit) {
+      return query.limit(limit);
+    }
+    return query;
+  }
+
+  async createActivityLog(log: InsertActivityLog): Promise<ActivityLog> {
+    const [created] = await db.insert(activityLogs).values(log).returning();
+    return created;
+  }
+
+  // Notifications
+  async getNotifications(userId?: string): Promise<Notification[]> {
+    if (userId) {
+      return db.select().from(notifications).where(eq(notifications.userId, userId)).orderBy(desc(notifications.createdAt));
+    }
+    return db.select().from(notifications).orderBy(desc(notifications.createdAt));
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [created] = await db.insert(notifications).values(notification).returning();
+    return created;
+  }
+
+  async markNotificationRead(id: string): Promise<boolean> {
+    await db.update(notifications).set({ read: true }).where(eq(notifications.id, id));
+    return true;
+  }
+
+  async deleteNotification(id: string): Promise<boolean> {
+    await db.delete(notifications).where(eq(notifications.id, id));
+    return true;
   }
 }
 

@@ -378,3 +378,188 @@ export function useUpdateAdminOrder() {
     },
   });
 }
+
+// ========== USER PROFILE HOOKS ==========
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: { name?: string; email?: string; phone?: string; avatar?: string }) => {
+      const res = await apiRequest("PATCH", "/api/profile", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    },
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+      const res = await apiRequest("POST", "/api/profile/change-password", data);
+      return res.json();
+    },
+  });
+}
+
+// ========== ADMIN ANALYTICS HOOKS ==========
+
+export function useRevenueAnalytics() {
+  return useQuery<Array<{ month: string; revenue: number }>>({
+    queryKey: ["/api/admin/analytics/revenue"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/analytics/revenue", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch revenue analytics");
+      return res.json();
+    },
+  });
+}
+
+export function useTopRestaurants() {
+  return useQuery({
+    queryKey: ["/api/admin/analytics/top-restaurants"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/analytics/top-restaurants", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch top restaurants");
+      return res.json();
+    },
+  });
+}
+
+export function useUserGrowth() {
+  return useQuery<Array<{ month: string; users: number }>>({
+    queryKey: ["/api/admin/analytics/user-growth"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/analytics/user-growth", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch user growth");
+      return res.json();
+    },
+  });
+}
+
+// ========== ADMIN ACTIVITY LOGS HOOKS ==========
+
+export function useActivityLogs(limit?: number) {
+  return useQuery({
+    queryKey: ["/api/admin/activity-logs", limit],
+    queryFn: async () => {
+      const url = limit ? `/api/admin/activity-logs?limit=${limit}` : "/api/admin/activity-logs";
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch activity logs");
+      return res.json();
+    },
+  });
+}
+
+export function useCreateActivityLog() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: { activityType: string; description: string; metadata?: any }) => {
+      const res = await apiRequest("POST", "/api/admin/activity-logs", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/activity-logs"] });
+    },
+  });
+}
+
+// ========== ADMIN NOTIFICATIONS HOOKS ==========
+
+export function useNotifications() {
+  return useQuery({
+    queryKey: ["/api/admin/notifications"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/notifications", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch notifications");
+      return res.json();
+    },
+  });
+}
+
+export function useCreateNotification() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: { userId?: string; type: string; title: string; message: string; link?: string }) => {
+      const res = await apiRequest("POST", "/api/admin/notifications", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/notifications"] });
+    },
+  });
+}
+
+export function useMarkNotificationRead() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiRequest("PATCH", `/api/admin/notifications/${id}/read`, {});
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/notifications"] });
+    },
+  });
+}
+
+export function useDeleteNotification() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiRequest("DELETE", `/api/admin/notifications/${id}`, {});
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/notifications"] });
+    },
+  });
+}
+
+// ========== REVIEWS HOOKS ==========
+
+export function useRestaurantReviews(restaurantId: string) {
+  return useQuery({
+    queryKey: ["/api/restaurants", restaurantId, "reviews"],
+    queryFn: async () => {
+      const res = await fetch(`/api/restaurants/${restaurantId}/reviews`, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch reviews");
+      return res.json();
+    },
+    enabled: !!restaurantId,
+  });
+}
+
+export function useCreateReview() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ restaurantId, rating, comment }: { restaurantId: string; rating: number; comment?: string }) => {
+      const res = await apiRequest("POST", `/api/restaurants/${restaurantId}/reviews`, { rating, comment });
+      return res.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/restaurants", variables.restaurantId, "reviews"] });
+    },
+  });
+}
+
+export function useDeleteReview() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiRequest("DELETE", `/api/reviews/${id}`, {});
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/restaurants"] });
+    },
+  });
+}

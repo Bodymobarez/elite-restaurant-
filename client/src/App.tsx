@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider } from "./lib/auth";
@@ -15,6 +15,23 @@ import BookingConfirmation from "@/pages/booking-confirmation";
 import RestaurantOnboarding from "@/pages/restaurant-onboarding";
 import AdminDashboard from "@/pages/admin-dashboard";
 import RestaurantDashboard from "@/pages/restaurant-dashboard";
+import PlatformSettings from "@/pages/platform-settings";
+
+// Wrapper component to handle default tab based on route
+function AdminDashboardWrapper() {
+  const [location] = useLocation();
+  
+  let defaultTab = "overview";
+  if (location.includes("/admin/users")) defaultTab = "users";
+  else if (location.includes("/admin/restaurants")) defaultTab = "restaurants";
+  else if (location.includes("/admin/reservations")) defaultTab = "reservations";
+  else if (location.includes("/admin/orders")) defaultTab = "orders";
+  else if (location.includes("/admin/analytics")) defaultTab = "analytics";
+  else if (location.includes("/admin/logs")) defaultTab = "logs";
+  else if (location.includes("/admin/notifications")) defaultTab = "notifications";
+  
+  return <AdminDashboard defaultTab={defaultTab} />;
+}
 
 function Router() {
   return (
@@ -29,9 +46,16 @@ function Router() {
       <Route path="/booking-confirmation" component={BookingConfirmation} />
       <Route path="/onboarding" component={RestaurantOnboarding} />
       
-      {/* Admin Routes */}
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/restaurants" component={AdminDashboard} />
+      {/* Admin Routes - Both tab-based and separate routes */}
+      <Route path="/admin" component={AdminDashboardWrapper} />
+      <Route path="/admin/users" component={AdminDashboardWrapper} />
+      <Route path="/admin/restaurants" component={AdminDashboardWrapper} />
+      <Route path="/admin/reservations" component={AdminDashboardWrapper} />
+      <Route path="/admin/orders" component={AdminDashboardWrapper} />
+      <Route path="/admin/analytics" component={AdminDashboardWrapper} />
+      <Route path="/admin/logs" component={AdminDashboardWrapper} />
+      <Route path="/admin/notifications" component={AdminDashboardWrapper} />
+      <Route path="/admin/settings" component={PlatformSettings} />
       
       {/* Restaurant Owner Routes */}
       <Route path="/dashboard" component={RestaurantDashboard} />
