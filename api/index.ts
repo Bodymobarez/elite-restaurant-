@@ -53,15 +53,36 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
-// Initialize routes
-(async () => {
-  await registerRoutes(httpServer, app);
-  
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-  });
-})();
+// Initialize routes synchronously for Vercel serverless
+let routesInitialized = false;
+let initPromise: Promise<void> | null = null;
 
-export default app;
+async function initializeRoutes() {
+  if (routesInitialized) return;
+  if (initPromise) return initPromise;
+  
+  initPromise = (async () => {
+    await registerRoutes(httpServer, app);
+    
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      res.status(status).json({ message });
+    });
+    
+    routesInitialized = true;
+  })();
+  
+  return initPromise;
+}
+
+// Start initialization immediately
+initializeRoutes();
+
+// Wrap the app to ensure routes are initialized before handling requests
+const handler = async (req: Request, res: Response) => {
+  await initializeRoutes();
+  app(req, res);
+};
+
+export default handler;

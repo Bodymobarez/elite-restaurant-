@@ -3,7 +3,10 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 
-neonConfig.webSocketConstructor = ws;
+// Only set WebSocket constructor in Node.js environment (not in Vercel Edge)
+if (typeof globalThis.WebSocket === 'undefined') {
+  neonConfig.webSocketConstructor = ws;
+}
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -13,5 +16,11 @@ if (!connectionString) {
   );
 }
 
-export const pool = connectionString ? new Pool({ connectionString }) : null;
-export const db = pool ? drizzle({ client: pool, schema }) : null as any;
+// Create pool with connection string - handle both environments
+export const pool = connectionString 
+  ? new Pool({ connectionString }) 
+  : null;
+
+export const db = pool 
+  ? drizzle({ client: pool, schema }) 
+  : null as any;
