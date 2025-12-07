@@ -1,0 +1,75 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.ts",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/public"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/health",
+      "dest": "/api/health.ts"
+    },
+    {
+      "src": "/api/test-db",
+      "dest": "/api/test-db.ts"
+    },
+    {
+      "src": "/api/restaurants",
+      "dest": "/api/restaurants.ts"
+    },
+    {
+      "src": "/api/governorates",
+      "dest": "/api/governorates.ts"
+    },
+    {
+      "src": "/api/districts",
+      "dest": "/api/districts.ts"
+    },
+    {
+      "src": "/api/auth/me",
+      "dest": "/api/auth/me.ts"
+    },
+    {
+      "src": "/api/auth/login",
+      "dest": "/api/auth/login.ts"
+    },
+    {
+      "src": "/api/auth/register",
+      "dest": "/api/auth/register.ts"
+    },
+    {
+      "src": "/api/auth/logout",
+      "dest": "/api/auth/logout.ts"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/public",
+  "installCommand": "npm install",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
