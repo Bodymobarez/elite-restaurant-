@@ -38,22 +38,6 @@
       "dest": "/api/districts.ts"
     },
     {
-      "src": "/api/auth/me",
-      "dest": "/api/auth/me.ts"
-    },
-    {
-      "src": "/api/auth/login",
-      "dest": "/api/auth/login.ts"
-    },
-    {
-      "src": "/api/auth/register",
-      "dest": "/api/auth/register.ts"
-    },
-    {
-      "src": "/api/auth/logout",
-      "dest": "/api/auth/logout.ts"
-    },
-    {
       "src": "/api/(.*)",
       "dest": "/api/index.ts"
     },

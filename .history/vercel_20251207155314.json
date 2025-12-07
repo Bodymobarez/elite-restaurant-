@@ -46,14 +46,6 @@
       "dest": "/api/auth/login.ts"
     },
     {
-      "src": "/api/auth/register",
-      "dest": "/api/auth/register.ts"
-    },
-    {
-      "src": "/api/auth/logout",
-      "dest": "/api/auth/logout.ts"
-    },
-    {
       "src": "/api/(.*)",
       "dest": "/api/index.ts"
     },
