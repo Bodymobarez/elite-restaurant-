@@ -17,9 +17,6 @@ app.get("/api/debug", (req, res) => {
   });
 });
 
-// Import routes after debug endpoint
-import { registerRoutes } from "../server/routes";
-
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
