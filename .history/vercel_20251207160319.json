@@ -94,10 +94,6 @@
       "dest": "/api/admin/analytics/top-restaurants.ts"
     },
     {
-      "src": "/api/seed",
-      "dest": "/api/seed.ts"
-    },
-    {
       "src": "/api/(.*)",
       "dest": "/api/index.ts"
     },
