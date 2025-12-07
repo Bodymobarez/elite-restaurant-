@@ -72,7 +72,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-3xl mx-auto w-full bg-linear-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10"
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-3xl mx-auto w-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10"
             >
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Building2 className="w-5 h-5 text-primary hidden sm:block" />
@@ -185,10 +185,10 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.08, duration: 0.6 }}
                     viewport={{ once: true }}
-                    className="group cursor-pointer h-full bg-linear-to-br from-white/5 to-white/2 border border-white/5 rounded-2xl overflow-hidden hover:border-primary/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(212,175,55,0.15)]"
+                    className="group cursor-pointer h-full bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/5 rounded-2xl overflow-hidden hover:border-primary/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(212,175,55,0.15)]"
                     data-testid={`card-restaurant-${restaurant.id}`}
                   >
-                    <div className="relative aspect-4/3 overflow-hidden">
+                    <div className="relative aspect-[4/3] overflow-hidden">
                       <img 
                         src={restaurant.image || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"} 
                         alt={restaurant.name} 
